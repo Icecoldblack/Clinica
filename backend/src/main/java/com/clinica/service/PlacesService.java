@@ -133,7 +133,7 @@ public class PlacesService {
                 .type(type)
                 .isOpenNow(isOpen)
                 .distanceMiles(distanceMiles)
-                .acceptsInsurance(null)     // Unknown until Gemini enrichment
+                .inNetwork(null)        // Unknown until Gemini enrichment
                 .insuranceNote(null)
                 .website(website)
                 .googleMapsUrl("https://www.google.com/maps/place/?q=place_id:" + placeId)

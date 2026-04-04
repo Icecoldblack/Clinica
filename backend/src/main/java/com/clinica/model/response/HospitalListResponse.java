@@ -14,4 +14,5 @@ public class HospitalListResponse {
     private String insuranceProvider;
     private String planName;
     private int totalFound;
+    private int totalInNetwork;         // Count of confirmed in-network hospitals
 }
