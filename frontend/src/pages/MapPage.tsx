@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import { useClinics } from '../hooks/useClinics';
-import Navbar from '../components/common/Navbar';
+import SidebarLayout from '../components/layout/SidebarLayout';
 import InfoCallout from '../components/common/InfoCallout';
 import FilterPanel from '../components/map/FilterPanel';
 import ClinicCard from '../components/map/ClinicCard';
@@ -18,21 +18,15 @@ export default function MapPage() {
 
   // Route guard
   useEffect(() => {
-    if (!situation) {
-      navigate('/', { replace: true });
-    }
+    if (!situation) navigate('/', { replace: true });
   }, [situation, navigate]);
 
-  // Geolocation (once)
+  // Geolocation
   useEffect(() => {
     if (!userLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        },
-        () => {
-          // Silently use Atlanta default
-        },
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {},
         { enableHighAccuracy: false, timeout: 5000 }
       );
     }
@@ -41,29 +35,16 @@ export default function MapPage() {
 
   if (!situation) return null;
 
-  const mapCenter: [number, number] = [
-    userLocation?.lat ?? 33.749,
-    userLocation?.lng ?? -84.388,
-  ];
+  const mapCenter: [number, number] = [userLocation?.lat ?? 33.749, userLocation?.lng ?? -84.388];
 
   return (
-    <div className="bg-surface min-h-screen flex flex-col">
-      {/* Navbar */}
-      <Navbar />
-
+    <SidebarLayout activeNav="clinics">
       <main className="flex flex-col md:flex-row flex-1 overflow-hidden" style={{ height: 'calc(100vh - 73px)' }}>
         {/* Sidebar */}
         <aside className="w-full md:w-[380px] bg-surface flex flex-col border-r border-outline-variant/15 overflow-y-auto custom-scrollbar flex-shrink-0">
-          {/* Info Callout */}
-          <InfoCallout
-            title={t('map.callout_title')}
-            body={t('map.callout_body')}
-          />
-
-          {/* Filters */}
+          <InfoCallout title={t('map.callout_title')} body={t('map.callout_body')} />
           <FilterPanel />
 
-          {/* Clinic List */}
           <div className="px-6 pb-24 space-y-4">
             <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-60">
               {clinics.length} {t('map.clinics_nearby')}
@@ -81,14 +62,15 @@ export default function MapPage() {
               </div>
             )}
 
-            {!isLoading && clinics.map((clinic) => (
-              <ClinicCard
-                key={clinic.id}
-                clinic={clinic}
-                isActive={activeClinicId === clinic.id}
-                onClick={() => setActiveClinicId(clinic.id)}
-              />
-            ))}
+            {!isLoading &&
+              clinics.map((clinic) => (
+                <ClinicCard
+                  key={clinic.id}
+                  clinic={clinic}
+                  isActive={activeClinicId === clinic.id}
+                  onClick={() => setActiveClinicId(clinic.id)}
+                />
+              ))}
 
             {!isLoading && clinics.length === 0 && !error && (
               <div className="text-center py-8">
@@ -109,48 +91,6 @@ export default function MapPage() {
           />
         </section>
       </main>
-
-      {/* Mobile Bottom Nav */}
-      <MobileBottomNav active="map" />
-    </div>
-  );
-}
-
-function MobileBottomNav({ active }: { active: 'home' | 'chat' | 'map' | 'support' }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-
-  const items = [
-    { key: 'home', icon: 'home', label: t('nav.home'), path: '/' },
-    { key: 'chat', icon: 'medical_services', label: t('nav.triage'), path: '/chat' },
-    { key: 'map', icon: 'location_on', label: t('nav.map'), path: '/clinics' },
-    { key: 'support', icon: 'contact_support', label: t('nav.support'), path: '#' },
-  ];
-
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-surface/80 backdrop-blur-xl border-t border-primary/10 shadow-[0_-4px_24px_rgba(154,64,40,0.08)]">
-      {items.map((item) => {
-        const isActive = active === item.key;
-        return (
-          <button
-            key={item.key}
-            onClick={() => item.path !== '#' && navigate(item.path)}
-            className={`flex flex-col items-center justify-center transition-all ${
-              isActive
-                ? 'bg-primary text-white rounded-full p-3 mb-2 scale-110'
-                : 'text-secondary opacity-60'
-            }`}
-          >
-            <span
-              className="material-symbols-outlined"
-              style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
-            >
-              {item.icon}
-            </span>
-            <span className="text-[11px] font-semibold">{item.label}</span>
-          </button>
-        );
-      })}
-    </nav>
+    </SidebarLayout>
   );
 }
