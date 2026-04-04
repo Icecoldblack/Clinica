@@ -20,7 +20,7 @@ export default function OnboardingPage() {
   const handleStart = () => {
     if (!selected) return;
     setSituation(selected);
-    navigate('/chat');
+    navigate('/home');
   };
 
   return (
