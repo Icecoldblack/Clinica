@@ -1,4 +1,4 @@
-<div align="center"> # Clínica
+<div align="center"> <h1>Clínica</h1>
 
 
 </div>
