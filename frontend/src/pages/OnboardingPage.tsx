@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext, type Situation, type InsuranceInfo } from '../context/AppContext';
-import LanguageToggle from '../components/common/LanguageToggle';
 import { getInsuranceProviders, type InsuranceProvider } from '../services/insuranceService';
 
 const SITUATIONS: { key: Situation; icon: string; labelKey: string; descKey: string }[] = [
@@ -15,7 +14,7 @@ const SITUATIONS: { key: Situation; icon: string; labelKey: string; descKey: str
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setSituation, setInsuranceInfo } = useAppContext();
+  const { setSituation, setInsuranceInfo, language, setLanguage } = useAppContext();
   
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedSituation, setSelectedSituation] = useState<Situation | null>(null);
@@ -86,7 +85,6 @@ export default function OnboardingPage() {
           <div className="text-2xl font-black text-primary font-headline tracking-tight">
             Clínica
           </div>
-          <LanguageToggle />
         </nav>
       </header>
 
@@ -108,6 +106,16 @@ export default function OnboardingPage() {
                 {t('onboarding.tagline').split('.')[1]?.trim() || 'In your language.'}
               </span>
             </p>
+
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+                className="bg-surface border border-outline-variant/30 text-primary font-bold px-5 py-2.5 rounded-full hover:bg-surface-container hover:shadow-md transition-all active:scale-95 shadow-sm inline-flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-xl">language</span>
+                {language === 'en' ? 'Ver en Español' : 'View in English'}
+              </button>
+            </div>
           </div>
 
           <div className="relative">

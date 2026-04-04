@@ -123,14 +123,6 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
               {t('nav.find_clinics')}
             </NavLink>
           </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
-              className="font-headline font-bold text-lg uppercase tracking-tight text-primary hover:text-tertiary transition-colors"
-            >
-              {language === 'en' ? 'EN' : 'ES'} | {language === 'en' ? 'ES' : 'EN'}
-            </button>
-          </div>
         </div>
         <div className="bg-outline-variant/20 h-[1px] w-full" />
       </header>
