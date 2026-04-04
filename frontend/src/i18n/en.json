@@ -118,7 +118,17 @@
     "explore_more": "Explore More Facilities",
     "need_help": "Need immediate help?",
     "need_help_desc": "Start a new triage session and get personalized clinic recommendations in minutes.",
-    "new_triage": "New Triage"
+    "new_triage": "New Triage",
+    "finish_session": "Finish Session",
+    "insurance_provider": "Insurance Provider",
+    "insurance_plan": "Plan",
+    "messages_count": "messages",
+    "no_sessions": "No triage sessions yet",
+    "no_sessions_desc": "Start a health conversation to get personalized guidance.",
+    "start_first_session": "Start Your First Session",
+    "no_saved_hospitals": "No saved hospitals yet",
+    "no_saved_hospitals_desc": "Search and bookmark hospitals for quick access.",
+    "find_hospitals_cta": "Find Hospitals"
   },
   "resources": {
     "badge": "KNOWLEDGE HUB",
@@ -184,6 +194,8 @@
     "home_card_title": "Find Hospitals Near You",
     "home_card_body": "Search hospitals that accept your insurance. Powered by Google Maps + AI verification.",
     "home_card_placeholder": "Enter ZIP code",
-    "home_card_cta": "Search →"
+    "home_card_cta": "Search →",
+    "save": "Save hospital",
+    "unsave": "Remove saved hospital"
   }
 }
