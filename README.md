@@ -1,5 +1,7 @@
-# Clínica
+<div align="center"> # Clínica
 
+
+</div>
 <div align="center">
   <p><strong>Your health navigator. In your language.</strong></p>
   <p>Clínica is a culturally competent, AI-powered health navigation platform designed to guide members of the Hispanic/Latino community in the United States toward safe, affordable, and accessible healthcare.</p>
