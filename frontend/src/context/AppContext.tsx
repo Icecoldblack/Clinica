@@ -25,6 +25,12 @@ function generateId(): string {
 // ─── Types ───
 export type Situation = 'no_insurance' | 'undocumented' | 'mental_health' | 'insured';
 
+const SITUATION_STORAGE_KEY = 'clinica_situation';
+
+function isSituation(value: unknown): value is Situation {
+  return value === 'no_insurance' || value === 'undocumented' || value === 'mental_health' || value === 'insured';
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   content: string;
@@ -83,10 +89,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation();
 
   const [language, _setLanguage] = useState<'en' | 'es'>('en');
-  const [situation, _setSituation] = useState<Situation | null>(null);
+  const [situation, _setSituation] = useState<Situation | null>(() => {
+    try {
+      const saved = localStorage.getItem(SITUATION_STORAGE_KEY);
+      return isSituation(saved) ? saved : null;
+    } catch {
+      return null;
+    }
+  });
   const [sessionId] = useState(() => generateId());
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [filters, _setFilters] = useState<Filters>({ noInsurance: false, noDocuments: false, mentalHealth: false });
+  const [filters, _setFilters] = useState<Filters>(() => (
+    situation ? SITUATION_FILTER_MAP[situation] : { noInsurance: false, noDocuments: false, mentalHealth: false }
+  ));
   const [userLocation, _setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [suggestClinics, _setSuggestClinics] = useState(false);
   const [insuranceInfo, _setInsuranceInfo] = useState<InsuranceInfo | null>(() => {
@@ -108,6 +123,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setSituation = useCallback((s: Situation) => {
     _setSituation(s);
     _setFilters(SITUATION_FILTER_MAP[s]);
+    localStorage.setItem(SITUATION_STORAGE_KEY, s);
   }, []);
 
   const addMessage = useCallback((msg: ChatMessage) => {

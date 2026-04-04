@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
@@ -13,11 +12,7 @@ export default function ResourcesPage() {
   const { t } = useTranslation();
   const { situation } = useAppContext();
 
-  useEffect(() => {
-    if (!situation) navigate('/', { replace: true });
-  }, [situation, navigate]);
-
-  if (!situation) return null;
+  if (!situation) return <Navigate to="/" replace />;
 
   return (
     <SidebarLayout activeNav="resources">
