@@ -1,7 +1,9 @@
 package com.clinica.controller;
 
 import com.clinica.model.request.ChatRequest;
+import com.clinica.model.request.SessionSummaryRequest;
 import com.clinica.model.response.ChatResponse;
+import com.clinica.model.response.SessionSummaryResponse;
 import com.clinica.service.GeminiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +28,11 @@ public class ChatController {
             return ResponseEntity.status(502)
                     .body(Map.of("error", "AI service is temporarily unavailable. Please try again."));
         }
+    }
+
+    @PostMapping("/chat/summarize")
+    public ResponseEntity<SessionSummaryResponse> summarizeSession(@RequestBody SessionSummaryRequest request) {
+        SessionSummaryResponse response = geminiService.summarizeSession(request);
+        return ResponseEntity.ok(response);
     }
 }

@@ -2,7 +2,9 @@ package com.clinica.service;
 
 import com.clinica.model.domain.ChatMessage;
 import com.clinica.model.request.ChatRequest;
+import com.clinica.model.request.SessionSummaryRequest;
 import com.clinica.model.response.ChatResponse;
+import com.clinica.model.response.SessionSummaryResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +88,102 @@ public class GeminiService {
         } catch (Exception e) {
             log.error("Gemini API call failed", e);
             throw new RuntimeException("Gemini API call failed: " + e.getMessage(), e);
+        }
+    }
+
+    public SessionSummaryResponse summarizeSession(SessionSummaryRequest request) {
+        String sessionId = request.getSessionId();
+        if (sessionId == null || sessionId.isBlank()) {
+            sessionId = "unknown";
+        }
+
+        // Build a flat transcript for Gemini
+        StringBuilder transcript = new StringBuilder();
+        List<ChatMessage> history = request.getHistory();
+        if (history != null) {
+            for (ChatMessage msg : history) {
+                String label = "user".equals(msg.getRole()) ? "Patient" : "Clínica AI";
+                transcript.append(label).append(": ").append(msg.getContent()).append("\n");
+            }
+        }
+
+        String lang = "es".equalsIgnoreCase(request.getLanguage()) ? "Spanish" : "English";
+
+        String prompt = """
+                You are summarizing a health triage conversation between a patient and the Clínica AI assistant.
+
+                CONVERSATION TRANSCRIPT:
+                %s
+
+                Respond with ONLY a JSON object in this exact format (no markdown, no code fences, no explanation):
+                {
+                  "title": "Short 3-6 word title describing the health concern in %s",
+                  "summary": "1-2 sentence plain-language summary of the conversation and any guidance given, in %s",
+                  "severity": "low|moderate|high|crisis",
+                  "tags": ["tag1", "tag2", "tag3"]
+                }
+
+                RULES for severity:
+                - "low" = general wellness question, mild symptoms
+                - "moderate" = symptoms that warrant a clinic visit
+                - "high" = symptoms that may need urgent/emergency care
+                - "crisis" = mentions of self-harm, suicidal ideation, or life-threatening emergency
+
+                RULES for tags: 2-4 short tags in %s describing the key health topics discussed (e.g. "Fever", "Cough", "Anxiety", "Urgent Care")
+                """.formatted(transcript.toString(), lang, lang, lang);
+
+        List<Map<String, Object>> contents = List.of(
+                Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))
+        );
+
+        Map<String, Object> requestBody = Map.of(
+                "contents", contents,
+                "generationConfig", Map.of(
+                        "temperature", 0.3,
+                        "maxOutputTokens", 512
+                )
+        );
+
+        try {
+            String responseJson = geminiWebClient.post()
+                    .uri("/{model}:generateContent?key={key}", model, apiKey)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            String responseText = extractResponseText(responseJson);
+
+            // Strip markdown code fences if Gemini wraps the JSON
+            responseText = responseText.trim();
+            if (responseText.startsWith("```")) {
+                responseText = responseText.replaceAll("^```[a-zA-Z]*\\n?", "").replaceAll("\\n?```$", "").trim();
+            }
+
+            JsonNode parsed = objectMapper.readTree(responseText);
+
+            String title = parsed.path("title").asText("Health Consultation");
+            String summary = parsed.path("summary").asText("Discussion about health concerns.");
+            String severity = parsed.path("severity").asText("low");
+            List<String> tags = new ArrayList<>();
+            JsonNode tagsNode = parsed.path("tags");
+            if (tagsNode.isArray()) {
+                for (JsonNode tag : tagsNode) {
+                    tags.add(tag.asText());
+                }
+            }
+
+            return new SessionSummaryResponse(sessionId, title, summary, severity, tags);
+        } catch (Exception e) {
+            log.error("Session summary generation failed", e);
+            // Return a graceful fallback instead of crashing
+            return new SessionSummaryResponse(
+                    sessionId,
+                    "Health Consultation",
+                    "A triage conversation was conducted.",
+                    "low",
+                    List.of("General")
+            );
         }
     }
 
