@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
+// Image URLs from original HTML design
+const IMG_HERO_MAIN = 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0VY8fRT2pR_RuSo0ow5giBYbjVajvPWKPnBOTzpVYifOLPps1Jb9qzvPU8tw5BV1kUqoYeDqYOVEawUsFeX71tVNRaTFbQbUDMT9DTnrPH8QzhkbJKTb8jXtMIgjCMMO_YknuA9usXcgaWjiPfPiaWM1m2pf8tYSmTUESO3wQsSrUQAOsQtRIb2cmgP7WeGf768XIT6H22apCuG-oiP9_AEC1l9L72IUMIKqWftp60WzVqDeZOJO4u5NU3mzpVIswxmYR-i5RHio';
+const IMG_HERO_PORTRAIT = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGnxclSCSfg3ydHcIY1i9_-j_MDqvAFqiRn90wjN4RjleZpQ3AoON6b62--iTALpZynInF2iE401gnU9fWwkbtjLcHIB0GZ9TqJla7RgSUYuT9Q_YgdRWJUvqPspCZQyhaw5yn-tCkcWLRszR2ZiNjnsyOkK7NMn62JZGl3p_IXZnQruaeCaFFCs_KmfE1mFNRP3UhUPDUQ8aVBFzLgsi7AlmhENLuhuNWskguMOo60i92eKrp_mQDe4suHKIwu9s1HXqI3DQp_84';
+
 export default function ResourcesPage() {
   const navigate = useNavigate();
   const { situation } = useAppContext();
@@ -31,11 +35,22 @@ export default function ResourcesPage() {
                 Navigating the healthcare system can be complex. We provide clear, culturally-grounded resources to help you advocate for yourself and your family.
               </p>
             </div>
+
+            {/* Hero image stack — main photo + portrait overlay */}
             <div className="lg:col-span-5 relative">
-              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl rotate-3 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[120px] text-primary/30" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  health_and_safety
-                </span>
+              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl rotate-3 bg-surface-container-high">
+                <img
+                  src={IMG_HERO_MAIN}
+                  alt="Modern healthcare interior with warm wood tones and natural light"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-6 -left-6 aspect-square w-48 rounded-2xl overflow-hidden shadow-xl -rotate-6 border-4 border-surface">
+                <img
+                  src={IMG_HERO_PORTRAIT}
+                  alt="Empowered diverse woman professional smiling"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -108,6 +123,14 @@ export default function ResourcesPage() {
             <div>
               <h3 className="text-4xl font-headline font-extrabold text-on-surface mb-2">Resource Library</h3>
               <p className="text-on-surface-variant">Guides and toolkits designed for your journey.</p>
+            </div>
+            <div className="hidden md:flex gap-2">
+              <button className="p-2 border border-outline-variant rounded-full text-outline hover:bg-surface-container transition-colors">
+                <span className="material-symbols-outlined">chevron_left</span>
+              </button>
+              <button className="p-2 border border-outline-variant rounded-full text-outline hover:bg-surface-container transition-colors">
+                <span className="material-symbols-outlined">chevron_right</span>
+              </button>
             </div>
           </div>
 

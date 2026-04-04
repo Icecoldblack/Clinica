@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
+// Image URLs from original HTML design
+const IMG_HERO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnMNX5F7Jkp6Z2umlp3zGHrjiU5rey2lA-n8aoUMV1edpMSCRQ-m8oJy9L3-vYJd5oJgzYNKUp4jNY9vVITDWN7F2fQ1lNUeVW0h8IsKavCHvBYpoy1mA-owfRBNQvFLhro2-sQloqYtZdFjhz6IzKnlLXp0Cp_v7sxDjOPvTZSs9pBD2oJCes22WqrVkUe_sS3Guxxvyk3213zrI8lPUKZ3JklX8HcTVOZqqout4qRIhgSU8JEly4Xe0e9tt8Y645HwBboD8TEqo';
+const IMG_MAP_PREVIEW = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBS8ziPQBRDnXY61ku6JZdDM3MHJ9B5xgd2t6FdQVKBiAJ6aXYZhg0KPUtcyhH81yaWGO2HfzvSRM1HiCJvwXRu3x7zCxNx8hJCsbobSjc5CZ5Jry3c_Mu0chAOjKQql1iBlzP6NVH5T8bxOqCUwAj5LMs2wzvbdzzOPER7XXVi2v-ssv_juG7xfYUeyC2T5e9COnh1auOnXmEn0sUoWZp9c4xyvrZpoLeTYHoG691yjUTK6JIcofINuU-p-HCzuuxJ86mXX3YcTic';
+const IMG_RIGHTS = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBlYvPVOndm2cGKq7E2uF8hBdp6AZ-BDJdt_5jQ-UXGffuATWulPhIJXqLc85KIGn4mcmMkn_S4xwD7CVwlnK4bJ-qfruWz7H3naAGi7sWl8mvQfGK6ZBZ4Bl3_GDLh9fjIDEqR7bULNL2dPyI6rLHUXrAMTGb6L2SJg4Frymow01lWlFTlz9_O4zEshu9VA66SkX_kMoU6wytIGkkTmNyll3SlCWJY6W_jchHQBmHyP-4QFS5x_o9Apal7gJg69kv6wUD2L3wvqNk';
+const IMG_FQHC = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAqnI7kRUfMZ0zFq7l2VRRILW2HxH45b0KawY7QapgqBt7WppzCK9yI30OcL1fLuKhP3YMp40_BDzWTwAGLXoH4e4XEFI3hdLX4HXeIZxu8m0G0QWklKCjgt5SCDYBx6ykz6SvSHSH17j074XUJLvO2A-qdOz-iLCZpx1gbjT6FtRUPWmKE_k6Rw3OquN7mCT7ZwA1gA7Pyv_7XJxEYLXlvYh2ES3wd1Tccp5dGwlkiC1lcUQbZGAF36yzxcNlg-qUqPScROxWywO4';
+const IMG_USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvdoHPz2sRUrB-D9AaKIIeXD1c-HZs4s9mjJ4gzykvWzIGAg8ueRCx-ePOhw8vmJ3Me_WRK0Lxad2_evG4JAGA5kOxlatGHFw3Wa0ONHvEpNKOfk0L-PXHRGMlTP_miXYDADOICf1foenJjXJ18GpxzDhqZCAI_6y9WMjXFgENI5Ub0D2YUwEeikCcrueDRfbEMTz-MiZXirXgAozwrg6WoB-iKRHO_LxvobUexlJOSZx1rau5m2kEY1CkqgT2EHzBrDW2jZU9pvc';
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { situation } = useAppContext();
@@ -25,7 +32,12 @@ export default function HomePage() {
       <main className="px-6 lg:px-12 max-w-7xl mx-auto py-8">
         {/* Hero Welcome */}
         <section className="relative overflow-hidden rounded-xl mb-12 group">
-          <div className="absolute inset-0 bg-primary-container opacity-90" />
+          <img
+            src={IMG_HERO}
+            alt="Warm interior of a community health center"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-primary-container opacity-90 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent" />
           <div className="relative z-10 p-8 lg:p-16 flex flex-col items-start max-w-2xl">
             <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4 tracking-tight">
@@ -83,7 +95,7 @@ export default function HomePage() {
           {/* Insurance Status */}
           <div className="md:col-span-4 bg-error-container/20 rounded-xl p-8 border border-error/10 flex flex-col justify-between">
             <div>
-              <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Situation Profile</h4>
+              <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Insurance Profile</h4>
               <p className="text-xl font-headline font-bold text-error">
                 Current Situation:<br />
                 {situationLabel[situation] || situation}
@@ -135,8 +147,13 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            <div className="h-32 bg-surface-container-highest relative overflow-hidden">
-              <div className="absolute inset-0 bg-surface-dim/30" />
+            {/* Map thumbnail image */}
+            <div className="h-32 relative overflow-hidden">
+              <img
+                src={IMG_MAP_PREVIEW}
+                alt="Map preview"
+                className="w-full h-full object-cover opacity-50 grayscale"
+              />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-primary text-white p-2 rounded-full shadow-lg">
                   <span className="material-symbols-outlined">location_on</span>
@@ -156,14 +173,16 @@ export default function HomePage() {
                 <p className="text-sm text-on-surface-variant mb-3">
                   Understand healthcare privacy and access laws for everyone.
                 </p>
-                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1 group">
+                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1">
                   Read Guide <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </span>
               </div>
-              <div className="w-24 h-24 bg-primary/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-4xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  gavel
-                </span>
+              <div className="w-24 h-24 bg-primary/5 rounded-lg overflow-hidden flex-shrink-0">
+                <img
+                  src={IMG_RIGHTS}
+                  alt="Legal rights guide"
+                  className="w-full h-full object-cover mix-blend-multiply opacity-80"
+                />
               </div>
             </button>
 
@@ -176,14 +195,16 @@ export default function HomePage() {
                 <p className="text-sm text-on-surface-variant mb-3">
                   Federally Qualified Health Centers provide safe care regardless of status.
                 </p>
-                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1 group">
+                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1">
                   Learn More <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </span>
               </div>
-              <div className="w-24 h-24 bg-secondary/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-4xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  security
-                </span>
+              <div className="w-24 h-24 bg-secondary/5 rounded-lg overflow-hidden flex-shrink-0">
+                <img
+                  src={IMG_FQHC}
+                  alt="FQHC protection"
+                  className="w-full h-full object-cover mix-blend-multiply opacity-80"
+                />
               </div>
             </button>
           </div>
@@ -196,11 +217,15 @@ export default function HomePage() {
             <div>
               <h5 className="font-headline font-bold text-xl text-on-tertiary-fixed-variant">Your Privacy is Our Priority</h5>
               <p className="text-on-tertiary-fixed-variant opacity-80">
-                Federal law prohibits health centers from sharing your personal information with authorities. Your health data is encrypted and protected under HIPAA.
+                Federal law prohibits health centers from sharing your personal information with authorities. Your health data is encrypted and protected under HIPAA and federal statutes.
               </p>
             </div>
           </div>
         </div>
+
+        {/* User profile Easter egg in sidebar is handled by SidebarLayout */}
+        {/* Hidden avatar image preload */}
+        <img src={IMG_USER_AVATAR} alt="" className="hidden" aria-hidden />
       </main>
     </SidebarLayout>
   );
