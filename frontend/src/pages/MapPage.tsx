@@ -35,7 +35,7 @@ export default function MapPage() {
 
   if (!situation) return null;
 
-  const mapCenter: [number, number] = [userLocation?.lat ?? 33.749, userLocation?.lng ?? -84.388];
+  const mapCenter = { lat: userLocation?.lat ?? 33.749, lng: userLocation?.lng ?? -84.388 };
 
   return (
     <SidebarLayout activeNav="clinics">

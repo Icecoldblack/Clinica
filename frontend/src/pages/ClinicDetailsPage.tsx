@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
@@ -10,6 +11,7 @@ const IMG_USER_SIDEBAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCF
 
 export default function ClinicDetailsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { situation } = useAppContext();
 
   useEffect(() => {
@@ -34,24 +36,24 @@ export default function ClinicDetailsPage() {
           </div>
           <div className="relative z-10 flex-1">
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-tertiary text-on-tertiary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">FQHC ✦</span>
-              <span className="text-sm font-semibold opacity-90 uppercase tracking-tight">Federally Qualified</span>
+              <span className="bg-tertiary text-on-tertiary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">{t('clinicDetails.badge_fqhc')}</span>
+              <span className="text-sm font-semibold opacity-90 uppercase tracking-tight">{t('clinicDetails.badge_desc')}</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-headline font-extrabold mb-4 leading-none tracking-tight">
               Good Samaritan Health Center
             </h1>
             <p className="text-lg md:text-xl font-body opacity-90 max-w-xl">
-              Compassionate care deeply rooted in the heart of our community. Your health journey begins in a space that feels like home.
+              {t('clinicDetails.subtitle')}
             </p>
           </div>
           <div className="relative z-10 flex flex-col gap-4 w-full md:w-auto">
             <button className="bg-surface-container-lowest text-primary px-8 py-4 rounded-lg font-bold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all active:scale-95">
               <span className="material-symbols-outlined">call</span>
-              CALL NOW
+              {t('clinicDetails.btn_call')}
             </button>
             <button className="border border-white/30 text-white px-8 py-4 rounded-lg font-bold flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
               <span className="material-symbols-outlined">calendar_today</span>
-              SCHEDULE VISIT
+              {t('clinicDetails.btn_schedule')}
             </button>
           </div>
         </section>
@@ -65,7 +67,7 @@ export default function ClinicDetailsPage() {
                 <div>
                   <div className="text-secondary font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
                     <span className="material-symbols-outlined text-sm">location_on</span>
-                    Location
+                    {t('clinicDetails.location')}
                   </div>
                   <h3 className="text-2xl font-headline font-bold text-on-surface mb-2">123 Community Way</h3>
                   <p className="text-on-surface-variant leading-relaxed">
@@ -74,7 +76,7 @@ export default function ClinicDetailsPage() {
                 </div>
                 <div className="mt-8">
                   <button className="text-primary font-bold flex items-center gap-2 group">
-                    Open in Google Maps
+                    {t('clinicDetails.open_maps')}
                     <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
                 </div>
@@ -84,20 +86,20 @@ export default function ClinicDetailsPage() {
               <div className="bg-surface-container-low p-8 rounded-xl">
                 <div className="text-secondary font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-sm">schedule</span>
-                  Operating Hours
+                  {t('clinicDetails.hours')}
                 </div>
                 <ul className="space-y-3">
                   <li className="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
-                    <span className="text-on-surface-variant">Mon – Fri</span>
+                    <span className="text-on-surface-variant">{t('clinicDetails.mon_fri')}</span>
                     <span className="font-bold text-on-surface">8:00 AM – 7:00 PM</span>
                   </li>
                   <li className="flex justify-between items-center text-sm border-b border-outline-variant/20 pb-2">
-                    <span className="text-on-surface-variant">Saturday</span>
+                    <span className="text-on-surface-variant">{t('clinicDetails.sat')}</span>
                     <span className="font-bold text-on-surface">9:00 AM – 2:00 PM</span>
                   </li>
                   <li className="flex justify-between items-center text-sm italic">
-                    <span className="text-on-surface-variant">Sunday</span>
-                    <span className="text-error font-medium">Closed</span>
+                    <span className="text-on-surface-variant">{t('clinicDetails.sun')}</span>
+                    <span className="text-error font-medium">{t('clinicDetails.closed')}</span>
                   </li>
                 </ul>
               </div>
@@ -112,25 +114,25 @@ export default function ClinicDetailsPage() {
                     <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
                       <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>security</span>
                     </div>
-                    <h2 className="text-3xl font-headline font-extrabold tracking-tight">Your safety is protected.</h2>
+                    <h2 className="text-3xl font-headline font-extrabold tracking-tight">{t('clinicDetails.safety_title')}</h2>
                   </div>
                   <p className="text-lg opacity-90 leading-relaxed">
-                    Under the law, your health information is private. We provide confidential care regardless of immigration status. This clinic is a safe haven for all seeking wellness.
+                    {t('clinicDetails.safety_desc')}
                   </p>
                 </div>
               </div>
 
               {/* Services Grid */}
               <div className="bg-surface-container-lowest p-8 rounded-xl md:col-span-2">
-                <h3 className="text-2xl font-headline font-bold text-on-surface mb-8">Specialized Care Services</h3>
+                <h3 className="text-2xl font-headline font-bold text-on-surface mb-8">{t('clinicDetails.services_title')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   {[
-                    { icon: 'child_care', label: 'Pediatrics', desc: 'Specialized child and adolescent care.' },
-                    { icon: 'dentistry', label: 'Dental', desc: 'Routine checkups and emergency oral health.' },
-                    { icon: 'psychology', label: 'Mental Health', desc: 'Counseling and behavioral support services.' },
-                    { icon: 'medication', label: 'Pharmacy', desc: 'On-site medication and expert consultation.' },
-                    { icon: 'female', label: "Women's Health", desc: 'Comprehensive reproductive and preventative care.' },
-                    { icon: 'biotech', label: 'Lab Services', desc: 'Rapid diagnostic testing and screenings.' },
+                    { icon: 'child_care', label: t('clinicDetails.srv_pediatrics'), desc: t('clinicDetails.srv_pediatrics_desc') },
+                    { icon: 'dentistry', label: t('clinicDetails.srv_dental'), desc: t('clinicDetails.srv_dental_desc') },
+                    { icon: 'psychology', label: t('clinicDetails.srv_mental'), desc: t('clinicDetails.srv_mental_desc') },
+                    { icon: 'medication', label: t('clinicDetails.srv_pharmacy'), desc: t('clinicDetails.srv_pharmacy_desc') },
+                    { icon: 'female', label: t('clinicDetails.srv_womens'), desc: t('clinicDetails.srv_womens_desc') },
+                    { icon: 'biotech', label: t('clinicDetails.srv_lab'), desc: t('clinicDetails.srv_lab_desc') },
                   ].map((s) => (
                     <div key={s.label} className="flex flex-col gap-4 p-6 rounded-lg bg-surface hover:bg-surface-container-high transition-colors">
                       <span className="material-symbols-outlined text-primary text-3xl">{s.icon}</span>
@@ -159,9 +161,9 @@ export default function ClinicDetailsPage() {
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-xs text-on-surface-variant mb-4 italic">Estimated 12 mins travel from your current location.</p>
+                <p className="text-xs text-on-surface-variant mb-4 italic">{t('clinicDetails.travel_est')}</p>
                 <button className="w-full py-4 bg-surface-container-high rounded-lg text-secondary font-bold hover:bg-secondary-container hover:text-on-secondary-container transition-all">
-                  Get Directions
+                  {t('clinicDetails.get_directions')}
                 </button>
               </div>
             </div>
@@ -169,9 +171,9 @@ export default function ClinicDetailsPage() {
             {/* Community Trust */}
             <div className="p-8 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant">
               <span className="material-symbols-outlined text-4xl mb-4 block">volunteer_activism</span>
-              <h4 className="text-xl font-headline font-bold mb-2">Community First</h4>
+              <h4 className="text-xl font-headline font-bold mb-2">{t('clinicDetails.community_title')}</h4>
               <p className="text-sm opacity-90 leading-relaxed mb-6">
-                This center has served over 12,000 families this year. We offer sliding scale fees based on income to ensure no one is turned away.
+                {t('clinicDetails.community_desc')}
               </p>
               <div className="flex -space-x-3 mb-4">
                 <div className="w-10 h-10 rounded-full border-2 border-tertiary-fixed bg-secondary flex items-center justify-center text-[10px] text-white font-bold">SJ</div>
@@ -179,7 +181,7 @@ export default function ClinicDetailsPage() {
                 <div className="w-10 h-10 rounded-full border-2 border-tertiary-fixed bg-tertiary flex items-center justify-center text-[10px] text-white font-bold">AL</div>
                 <div className="w-10 h-10 rounded-full border-2 border-tertiary-fixed bg-surface-container flex items-center justify-center text-[10px] text-on-surface font-bold">+4k</div>
               </div>
-              <p className="text-[10px] font-bold uppercase tracking-widest">Trusted by your neighbors</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest">{t('clinicDetails.trusted_by')}</p>
             </div>
 
             {/* Contact Card */}
@@ -193,23 +195,23 @@ export default function ClinicDetailsPage() {
                   />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-on-surface">User Profile</div>
-                  <div className="text-[10px] text-on-surface-variant">Manage Health</div>
+                  <div className="text-xs font-bold text-on-surface">{t('clinicDetails.user_profile')}</div>
+                  <div className="text-[10px] text-on-surface-variant">{t('clinicDetails.manage_health')}</div>
                 </div>
               </div>
-              <h4 className="font-headline font-bold text-lg mb-4">Direct Lines</h4>
+              <h4 className="font-headline font-bold text-lg mb-4">{t('clinicDetails.direct_lines')}</h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <span className="material-symbols-outlined text-secondary">phone</span>
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-on-surface-variant">General Inquiries</div>
+                    <div className="text-[10px] uppercase font-bold text-on-surface-variant">{t('clinicDetails.general_inq')}</div>
                     <div className="font-bold">(210) 555-0123</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="material-symbols-outlined text-secondary">emergency</span>
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-on-surface-variant">After Hours Care</div>
+                    <div className="text-[10px] uppercase font-bold text-on-surface-variant">{t('clinicDetails.after_hours')}</div>
                     <div className="font-bold">(210) 555-0199</div>
                   </div>
                 </div>
@@ -221,7 +223,7 @@ export default function ClinicDetailsPage() {
               className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-container transition-all active:scale-95 flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined">arrow_back</span>
-              Back to Clinic Map
+              {t('clinicDetails.back_map')}
             </button>
           </div>
         </div>
