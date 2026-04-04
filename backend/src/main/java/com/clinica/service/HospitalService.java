@@ -130,7 +130,10 @@ public class HospitalService {
                 .thenComparingDouble(Hospital::getDistanceMiles));
 
         // 5. Take top 10
-        List<Hospital> top = scored.stream().limit(10).toList();
+        List<Hospital> top = new ArrayList<>(scored.stream().limit(10).toList());
+
+        // 5b. Enrich Places hospitals with phone/website/address from Details API
+        placesService.enrichWithDetails(top);
 
         // 6. Gemini enrichment — write a coverage note for each hospital
         if (apiKey != null && !apiKey.isBlank()) {
@@ -254,28 +257,47 @@ public class HospitalService {
             StringBuilder hospitalList = new StringBuilder();
             for (int i = 0; i < hospitals.size(); i++) {
                 Hospital h = hospitals.get(i);
-                String networkStatus = Boolean.TRUE.equals(h.getInNetwork())  ? "IN-NETWORK"
-                        : Boolean.FALSE.equals(h.getInNetwork()) ? "OUT-OF-NETWORK"
-                        : "UNKNOWN";
-                hospitalList.append(String.format("%d. %s — %s — Insurance: %s%n",
-                        i + 1, h.getName(), h.getType(), networkStatus));
+                String networkStatus = Boolean.TRUE.equals(h.getInNetwork())  ? "IN-NETWORK (confirmed)"
+                        : Boolean.FALSE.equals(h.getInNetwork()) ? "OUT-OF-NETWORK (confirmed)"
+                        : "UNKNOWN — please determine";
+                hospitalList.append(String.format("%d. %s | Type: %s | Location: %s | Insurance: %s%n",
+                        i + 1, h.getName(), h.getType(), h.getAddress(), networkStatus));
             }
 
             String prompt = """
-                    You are a helpful healthcare insurance advisor. \
-                    A patient has %s health insurance.
+                    You are an expert US healthcare insurance advisor with deep knowledge of \
+                    hospital networks, insurance contracts, and provider directories.
 
-                    For each hospital below, write ONE concise sentence (max 25 words) \
-                    about their likely insurance coverage situation. \
-                    For IN-NETWORK hospitals, confirm it warmly. \
-                    For OUT-OF-NETWORK, advise them to call first. \
-                    For UNKNOWN, give your best estimate based on the hospital system's \
-                    typical insurance contracts.
+                    A patient has **%s** health insurance.
+
+                    For each hospital below:
+                    1. Determine if the hospital likely accepts this insurance plan.
+                       - For hospitals marked "IN-NETWORK (confirmed)" or "OUT-OF-NETWORK (confirmed)", \
+                         keep that status.
+                       - For hospitals marked "UNKNOWN — please determine", use your knowledge of \
+                         the hospital system/network to estimate. Most major hospital systems \
+                         (Emory, Piedmont, Northside, WellStar, Grady, CHOA, HCA, etc.) accept \
+                         Medicare, Medicaid, and most major commercial plans. Smaller independent \
+                         practices vary more.
+                    2. Write ONE concise sentence (max 25 words) about their coverage situation.
 
                     Hospitals:
                     %s
-                    Respond ONLY with valid JSON, no markdown:
-                    {"notes": ["note for 1", "note for 2", ...]}
+
+                    Respond ONLY with valid JSON (no markdown code fences):
+                    {
+                      "results": [
+                        {"inNetwork": true, "note": "Emory Midtown accepts BCBS PPO — no referral needed."},
+                        {"inNetwork": false, "note": "Call ahead to verify coverage as this practice may not be in-network."},
+                        {"inNetwork": null, "note": "Unable to determine — call the facility to confirm coverage."}
+                      ]
+                    }
+
+                    RULES:
+                    - inNetwork: true = likely in-network, false = likely out-of-network, null = truly cannot determine
+                    - For Medicare/Medicaid: most hospitals accept these by law; set true unless it's a very specialized/boutique facility
+                    - For commercial plans (BCBS, Aetna, Cigna, UHC, etc.): major hospital systems usually accept them
+                    - Be helpful — an educated estimate is better than "unknown"
                     """.formatted(planDesc, hospitalList);
 
             Map<String, Object> requestBody = Map.of(
@@ -285,7 +307,7 @@ public class HospitalService {
                     )),
                     "generationConfig", Map.of(
                             "temperature", 0.2,
-                            "maxOutputTokens", 800
+                            "maxOutputTokens", 1200
                     )
             );
 
@@ -296,14 +318,14 @@ public class HospitalService {
                     .bodyToMono(String.class)
                     .block();
 
-            applyNotes(hospitals, responseJson);
+            applyEnrichment(hospitals, responseJson);
 
         } catch (Exception e) {
             log.warn("Gemini coverage enrichment failed (hospitals still returned): {}", e.getMessage());
         }
     }
 
-    private void applyNotes(List<Hospital> hospitals, String responseJson) throws Exception {
+    private void applyEnrichment(List<Hospital> hospitals, String responseJson) throws Exception {
         JsonNode root = objectMapper.readTree(responseJson);
         JsonNode candidates = root.path("candidates");
         if (candidates.isEmpty() || !candidates.isArray()) return;
@@ -318,15 +340,60 @@ public class HospitalService {
         if (start == -1 || end == -1) return;
 
         JsonNode parsed = objectMapper.readTree(text.substring(start, end + 1));
-        JsonNode notes = parsed.path("notes");
-        if (!notes.isArray()) return;
+        JsonNode results = parsed.path("results");
+        if (!results.isArray()) {
+            // Fallback: try the old "notes" format
+            JsonNode notes = parsed.path("notes");
+            if (notes.isArray()) {
+                for (int i = 0; i < Math.min(notes.size(), hospitals.size()); i++) {
+                    String note = notes.get(i).asText(null);
+                    if (note != null && !note.isBlank()) {
+                        hospitals.get(i).setInsuranceNote(note);
+                    }
+                }
+            }
+            return;
+        }
 
-        for (int i = 0; i < Math.min(notes.size(), hospitals.size()); i++) {
-            String note = notes.get(i).asText(null);
+        for (int i = 0; i < Math.min(results.size(), hospitals.size()); i++) {
+            JsonNode entry = results.get(i);
+            Hospital h = hospitals.get(i);
+
+            // Apply insurance note
+            String note = entry.path("note").asText(null);
             if (note != null && !note.isBlank()) {
-                hospitals.get(i).setInsuranceNote(note);
+                h.setInsuranceNote(note);
+            }
+
+            // Apply inNetwork status — but only if the hospital was previously UNKNOWN
+            // Don't override seed data confirmations
+            if (h.getInNetwork() == null) {
+                JsonNode inNetworkNode = entry.path("inNetwork");
+                if (!inNetworkNode.isMissingNode() && !inNetworkNode.isNull()) {
+                    boolean geminiVerdict = inNetworkNode.asBoolean();
+                    h.setInNetwork(geminiVerdict);
+
+                    // Re-score: give a boost for Gemini-confirmed in-network
+                    if (geminiVerdict) {
+                        h.setMatchScore(h.getMatchScore() + SCORE_PROVIDER);
+                        String existingReason = h.getMatchReason();
+                        h.setMatchReason(existingReason.replace(
+                                "Insurance acceptance unverified",
+                                "Likely in-network: " + (note != null ? note : "AI-verified")));
+                    } else {
+                        String existingReason = h.getMatchReason();
+                        h.setMatchReason(existingReason.replace(
+                                "Insurance acceptance unverified",
+                                "Likely out-of-network"));
+                    }
+                }
             }
         }
+
+        // Re-sort after score adjustments from Gemini enrichment
+        hospitals.sort(Comparator
+                .comparingInt(Hospital::getMatchScore).reversed()
+                .thenComparingDouble(Hospital::getDistanceMiles));
     }
 
     // ─── Utilities ──────────────────────────────────────────────────────────

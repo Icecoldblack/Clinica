@@ -113,7 +113,6 @@ public class PlacesService {
         double rating = place.path("rating").asDouble(0);
         int ratingsTotal = place.path("user_ratings_total").asInt(0);
         boolean isOpen = place.path("opening_hours").path("open_now").asBoolean(false);
-        String website = place.path("website").asText(null);
 
         // Determine facility type from types array
         String type = classifyType(place.path("types"));
@@ -127,7 +126,7 @@ public class PlacesService {
                 .address(address)
                 .lat(placeLat)
                 .lng(placeLng)
-                .phone(null)    // Requires a Details call — enriched later by HospitalService if needed
+                .phone(null)    // Filled by enrichWithDetails()
                 .rating(rating)
                 .userRatingsTotal(ratingsTotal)
                 .type(type)
@@ -135,9 +134,49 @@ public class PlacesService {
                 .distanceMiles(distanceMiles)
                 .inNetwork(null)        // Unknown until Gemini enrichment
                 .insuranceNote(null)
-                .website(website)
+                .website(null)          // Filled by enrichWithDetails()
                 .googleMapsUrl("https://www.google.com/maps/place/?q=place_id:" + placeId)
                 .build();
+    }
+
+    /**
+     * Enrich a list of hospitals with Place Details (phone, website, formatted address).
+     * Each call fetches the essential contact fields that Nearby Search doesn't return.
+     */
+    public void enrichWithDetails(List<Hospital> hospitals) {
+        if (!isAvailable()) return;
+
+        for (Hospital h : hospitals) {
+            // Only enrich Places API results (they have place IDs starting with "Ch")
+            if (h.getId() == null || !h.getId().startsWith("Ch")) continue;
+
+            try {
+                String detailsJson = mapsWebClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/place/details/json")
+                                .queryParam("place_id", h.getId())
+                                .queryParam("fields", "formatted_phone_number,website,formatted_address")
+                                .queryParam("key", apiKey)
+                                .build())
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();
+
+                JsonNode root = objectMapper.readTree(detailsJson);
+                JsonNode result = root.path("result");
+
+                String phone = result.path("formatted_phone_number").asText(null);
+                String website = result.path("website").asText(null);
+                String fullAddress = result.path("formatted_address").asText(null);
+
+                if (phone != null && !phone.isBlank()) h.setPhone(phone);
+                if (website != null && !website.isBlank()) h.setWebsite(website);
+                if (fullAddress != null && !fullAddress.isBlank()) h.setAddress(fullAddress);
+
+            } catch (Exception e) {
+                log.debug("Place Details failed for {}: {}", h.getId(), e.getMessage());
+            }
+        }
     }
 
     private String classifyType(JsonNode typesNode) {
