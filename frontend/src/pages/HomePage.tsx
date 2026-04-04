@@ -6,7 +6,7 @@ import SidebarLayout from '../components/layout/SidebarLayout';
 
 // Image URLs from original HTML design
 const IMG_HERO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnMNX5F7Jkp6Z2umlp3zGHrjiU5rey2lA-n8aoUMV1edpMSCRQ-m8oJy9L3-vYJd5oJgzYNKUp4jNY9vVITDWN7F2fQ1lNUeVW0h8IsKavCHvBYpoy1mA-owfRBNQvFLhro2-sQloqYtZdFjhz6IzKnlLXp0Cp_v7sxDjOPvTZSs9pBD2oJCes22WqrVkUe_sS3Guxxvyk3213zrI8lPUKZ3JklX8HcTVOZqqout4qRIhgSU8JEly4Xe0e9tt8Y645HwBboD8TEqo';
-const IMG_MAP_PREVIEW = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBS8ziPQBRDnXY61ku6JZdDM3MHJ9B5xgd2t6FdQVKBiAJ6aXYZhg0KPUtcyhH81yaWGO2HfzvSRM1HiCJvwXRu3x7zCxNx8hJCsbobSjc5CZ5Jry3c_Mu0chAOjKQql1iBlzP6NVH5T8bxOqCUwAj5LMs2wzvbdzzOPER7XXVi2v-ssv_juG7xfYUeyC2T5e9COnh1auOnXmEn0sUoWZp9c4xyvrZpoLeTYHoG691yjUTK6JIcofINuU-p-HCzuuxJ86mXX3YcTic';
+
 const IMG_RIGHTS = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBlYvPVOndm2cGKq7E2uF8hBdp6AZ-BDJdt_5jQ-UXGffuATWulPhIJXqLc85KIGn4mcmMkn_S4xwD7CVwlnK4bJ-qfruWz7H3naAGi7sWl8mvQfGK6ZBZ4Bl3_GDLh9fjIDEqR7bULNL2dPyI6rLHUXrAMTGb6L2SJg4Frymow01lWlFTlz9_O4zEshu9VA66SkX_kMoU6wytIGkkTmNyll3SlCWJY6W_jchHQBmHyP-4QFS5x_o9Apal7gJg69kv6wUD2L3wvqNk';
 const IMG_FQHC = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAqnI7kRUfMZ0zFq7l2VRRILW2HxH45b0KawY7QapgqBt7WppzCK9yI30OcL1fLuKhP3YMp40_BDzWTwAGLXoH4e4XEFI3hdLX4HXeIZxu8m0G0QWklKCjgt5SCDYBx6ykz6SvSHSH17j074XUJLvO2A-qdOz-iLCZpx1gbjT6FtRUPWmKE_k6Rw3OquN7mCT7ZwA1gA7Pyv_7XJxEYLXlvYh2ES3wd1Tccp5dGwlkiC1lcUQbZGAF36yzxcNlg-qUqPScROxWywO4';
 const IMG_USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvdoHPz2sRUrB-D9AaKIIeXD1c-HZs4s9mjJ4gzykvWzIGAg8ueRCx-ePOhw8vmJ3Me_WRK0Lxad2_evG4JAGA5kOxlatGHFw3Wa0ONHvEpNKOfk0L-PXHRGMlTP_miXYDADOICf1foenJjXJ18GpxzDhqZCAI_6y9WMjXFgENI5Ub0D2YUwEeikCcrueDRfbEMTz-MiZXirXgAozwrg6WoB-iKRHO_LxvobUexlJOSZx1rau5m2kEY1CkqgT2EHzBrDW2jZU9pvc';
@@ -117,55 +117,42 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Nearby Clinics Preview */}
-          <div className="md:col-span-6 bg-surface-container-low rounded-xl overflow-hidden shadow-sm border border-outline-variant/15">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-headline text-xl font-bold">{t('home.bento_clinics_title')}</h3>
-                <button onClick={() => navigate('/clinics')} className="text-secondary font-bold text-sm">
-                  {t('home.bento_clinics_view')}
+          {/* Find Hospitals Near You */}
+          <div className="md:col-span-12 bg-surface rounded-xl p-8 shadow-sm border border-outline-variant/15 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden bg-gradient-to-r from-primary/5 to-transparent">
+            <div className="flex-1">
+              <h3 className="font-headline text-2xl font-extrabold text-primary mb-2 flex items-center gap-2">
+                <span className="material-symbols-outlined text-3xl">local_hospital</span>
+                {t('hospitals.home_card_title')}
+              </h3>
+              <p className="text-on-surface-variant font-medium mb-6">
+                {t('hospitals.home_card_body')}
+              </p>
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const zip = fd.get('zip');
+                  navigate(`/hospitals?zip=${zip}`);
+                }}
+                className="flex gap-2 max-w-md"
+              >
+                <input 
+                  name="zip"
+                  type="text" 
+                  placeholder={t('hospitals.home_card_placeholder')}
+                  className="flex-1 p-3 rounded-xl border border-outline-variant/30 text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  required
+                />
+                <button type="submit" className="bg-primary text-white font-bold px-6 rounded-xl hover:bg-primary-container shadow-lg flex items-center gap-2 shadow-primary/20 transition-all">
+                  {t('hospitals.home_card_cta')}
                 </button>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-surface-container-lowest rounded-lg">
-                  <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>domain</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-on-surface">Community Health East</p>
-                    <p className="text-xs text-on-surface-variant">{t('home.bento_clinics_dist1')}</p>
-                  </div>
-                  <span className="text-xs font-bold text-secondary">{t('home.bento_clinics_open')}</span>
-                </div>
-                <div className="flex items-start gap-4 p-4 bg-surface-container-lowest rounded-lg">
-                  <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>domain</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-on-surface">Mission District Medical</p>
-                    <p className="text-xs text-on-surface-variant">{t('home.bento_clinics_dist2')}</p>
-                  </div>
-                  <span className="text-xs font-bold text-tertiary">{t('home.bento_clinics_closing')}</span>
-                </div>
-              </div>
-            </div>
-            {/* Map thumbnail image */}
-            <div className="h-32 relative overflow-hidden">
-              <img
-                src={IMG_MAP_PREVIEW}
-                alt="Map preview"
-                className="w-full h-full object-cover opacity-50 grayscale"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-primary text-white p-2 rounded-full shadow-lg">
-                  <span className="material-symbols-outlined">location_on</span>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
 
+
           {/* Featured Resources */}
-          <div className="md:col-span-6 grid grid-cols-1 gap-6">
+          <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <button
               onClick={() => navigate('/resources')}
               className="bg-surface rounded-xl p-6 border border-outline-variant/20 shadow-sm flex gap-6 items-center text-left hover:shadow-lg transition-all"

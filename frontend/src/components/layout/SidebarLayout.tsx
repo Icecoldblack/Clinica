@@ -5,13 +5,14 @@ import type { ReactNode } from 'react';
 
 interface SidebarLayoutProps {
   children: ReactNode;
-  activeNav?: 'home' | 'chat' | 'clinics' | 'resources' | 'profile';
+  activeNav?: 'home' | 'chat' | 'clinics' | 'hospitals' | 'resources' | 'profile';
 }
 
 const NAV_ITEMS = [
   { key: 'home', icon: 'home', path: '/home' },
   { key: 'chat', icon: 'chat_bubble', path: '/chat' },
   { key: 'clinics', icon: 'map', path: '/clinics' },
+  { key: 'hospitals', icon: 'local_hospital', path: '/hospitals' },
   { key: 'resources', icon: 'library_books', path: '/resources' },
 ];
 
@@ -19,6 +20,7 @@ const MOBILE_ITEMS = [
   { key: 'home', icon: 'home', path: '/home' },
   { key: 'chat', icon: 'medical_services', path: '/chat' },
   { key: 'clinics', icon: 'location_on', path: '/clinics' },
+  { key: 'hospitals', icon: 'local_hospital', path: '/hospitals' },
   { key: 'resources', icon: 'contact_support', path: '/resources' },
 ];
 
@@ -32,6 +34,7 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
     if (location.pathname === '/home') return 'home';
     if (location.pathname === '/chat') return 'chat';
     if (location.pathname.startsWith('/clinics')) return 'clinics';
+    if (location.pathname === '/hospitals') return 'hospitals';
     if (location.pathname === '/resources') return 'resources';
     if (location.pathname === '/profile') return 'profile';
     return 'home';
@@ -55,6 +58,7 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
               home: t('nav.home'),
               chat: t('nav.chat'),
               clinics: t('nav.find_clinics'),
+              hospitals: t('nav.hospitals'),
               resources: t('nav.resources'),
             };
             return (
@@ -144,6 +148,7 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
             home: t('nav.home'),
             chat: t('nav.triage'),
             clinics: t('nav.map'),
+            hospitals: t('nav.hospitals'),
             resources: t('nav.support'),
           };
           return (

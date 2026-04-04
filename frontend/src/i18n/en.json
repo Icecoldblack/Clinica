@@ -12,7 +12,16 @@
     "situation_insured": "I have insurance but need help",
     "situation_insured_desc": "Simplify your benefits and navigate the complex system.",
     "cta_start": "Start Chat",
-    "disclaimer": "Encrypted & Anonymous • Secure Health Portal"
+    "disclaimer": "Encrypted & Anonymous • Secure Health Portal",
+    "insurance_title": "What's your insurance situation?",
+    "insurance_provider_label": "Insurance Provider",
+    "insurance_provider_placeholder": "Select your provider",
+    "insurance_plan_label": "Plan Name",
+    "insurance_plan_placeholder": "Select your plan (optional)",
+    "insurance_custom_provider": "Enter your provider name",
+    "insurance_custom_plan": "Enter your plan name",
+    "insurance_skip": "Skip for now",
+    "insurance_continue": "Continue"
   },
   "chat": {
     "placeholder": "Describe your symptoms or ask a question...",
@@ -48,7 +57,8 @@
     "triage": "Triage",
     "map": "Map",
     "support": "Support",
-    "profile": "Profile"
+    "profile": "Profile",
+    "hospitals": "Hospitals"
   },
   "footer": {
     "privacy": "Privacy Policy",
@@ -200,5 +210,31 @@
     "general_inq": "General Inquiries",
     "after_hours": "After Hours Care",
     "back_map": "Back to Clinic Map"
+  },
+  "hospitals": {
+    "page_title": "Find Hospitals",
+    "search_placeholder": "Enter ZIP code",
+    "use_location": "Use my location",
+    "search_button": "Search",
+    "edit_insurance": "Edit",
+    "add_insurance_prompt": "Add your insurance to see which hospitals are in-network",
+    "add_insurance_cta": "Add Insurance",
+    "no_results": "No hospitals found in this area. Try expanding the search radius.",
+    "radius_label": "Search radius",
+    "in_network": "In-Network ✓",
+    "out_of_network": "Out of Network",
+    "coverage_unknown": "Coverage Unknown",
+    "open_now": "Open now",
+    "closed": "Closed",
+    "call": "Call",
+    "directions": "Directions",
+    "website": "Website",
+    "modal_title": "Your Insurance",
+    "modal_save": "Save & Search",
+    "modal_cancel": "Cancel",
+    "home_card_title": "Find Hospitals Near You",
+    "home_card_body": "Search hospitals that accept your insurance. Powered by Google Maps + AI verification.",
+    "home_card_placeholder": "Enter ZIP code",
+    "home_card_cta": "Search →"
   }
 }

@@ -25,6 +25,12 @@ export interface Filters {
   mentalHealth: boolean;
 }
 
+export interface InsuranceInfo {
+  provider: string;
+  planName: string;
+  isCustom: boolean;
+}
+
 export interface AppState {
   language: 'en' | 'es';
   situation: Situation | null;
@@ -33,6 +39,7 @@ export interface AppState {
   filters: Filters;
   userLocation: { lat: number; lng: number } | null;
   suggestClinics: boolean;
+  insuranceInfo: InsuranceInfo | null;
 }
 
 interface AppContextType extends AppState {
@@ -42,6 +49,7 @@ interface AppContextType extends AppState {
   setFilters: (f: Filters) => void;
   setUserLocation: (coords: { lat: number; lng: number }) => void;
   setSuggestClinics: (v: boolean) => void;
+  setInsuranceInfo: (info: InsuranceInfo | null) => void;
 }
 
 const SITUATION_FILTER_MAP: Record<Situation, Filters> = {
@@ -63,6 +71,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [filters, _setFilters] = useState<Filters>({ noInsurance: false, noDocuments: false, mentalHealth: false });
   const [userLocation, _setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [suggestClinics, _setSuggestClinics] = useState(false);
+  const [insuranceInfo, _setInsuranceInfo] = useState<InsuranceInfo | null>(() => {
+    try {
+      const saved = localStorage.getItem('clinica_insurance');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const setLanguage = useCallback((lang: 'en' | 'es') => {
     _setLanguage(lang);
@@ -90,6 +106,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     _setSuggestClinics(v);
   }, []);
 
+  const setInsuranceInfo = useCallback((info: InsuranceInfo | null) => {
+    _setInsuranceInfo(info);
+    if (info) {
+      localStorage.setItem('clinica_insurance', JSON.stringify(info));
+    } else {
+      localStorage.removeItem('clinica_insurance');
+    }
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -100,12 +125,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         filters,
         userLocation,
         suggestClinics,
+        insuranceInfo,
         setLanguage,
         setSituation,
         addMessage,
         setFilters,
         setUserLocation,
         setSuggestClinics,
+        setInsuranceInfo,
       }}
     >
       {children}

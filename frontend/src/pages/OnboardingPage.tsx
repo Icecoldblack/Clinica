@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppContext, type Situation } from '../context/AppContext';
+import { useAppContext, type Situation, type InsuranceInfo } from '../context/AppContext';
 import LanguageToggle from '../components/common/LanguageToggle';
+import { getInsuranceProviders, type InsuranceProvider } from '../services/insuranceService';
 
 const SITUATIONS: { key: Situation; icon: string; labelKey: string; descKey: string }[] = [
   { key: 'no_insurance', icon: 'favorite', labelKey: 'onboarding.situation_no_insurance', descKey: 'onboarding.situation_no_insurance_desc' },
@@ -14,14 +15,68 @@ const SITUATIONS: { key: Situation; icon: string; labelKey: string; descKey: str
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setSituation } = useAppContext();
-  const [selected, setSelected] = useState<Situation | null>(null);
+  const { setSituation, setInsuranceInfo } = useAppContext();
+  
+  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedSituation, setSelectedSituation] = useState<Situation | null>(null);
 
-  const handleStart = () => {
-    if (!selected) return;
-    setSituation(selected);
+  // Insurance State
+  const [providers, setProviders] = useState<InsuranceProvider[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('');
+  const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const [customProvider, setCustomProvider] = useState<string>('');
+  const [customPlan, setCustomPlan] = useState<string>('');
+
+  useEffect(() => {
+    let mounted = true;
+    getInsuranceProviders()
+      .then((data) => {
+        if (mounted) {
+          setProviders(data);
+        }
+      })
+      .catch(() => {
+        // Handle error silently
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleNextStep = () => {
+    if (!selectedSituation) return;
+    setStep(2);
+  };
+
+  const finishOnboarding = (insurance: InsuranceInfo | null) => {
+    if (selectedSituation) {
+      setSituation(selectedSituation);
+    }
+    setInsuranceInfo(insurance);
     navigate('/home');
   };
+
+  const handleSkipInsurance = () => {
+    finishOnboarding(null);
+  };
+
+  const handleContinueInsurance = () => {
+    const isCustom = selectedProvider === 'other' || selectedPlan === 'other';
+    const finalProvider = selectedProvider === 'other' ? customProvider : selectedProvider;
+    const finalPlan = selectedPlan === 'other' ? customPlan : selectedPlan;
+    
+    if (!finalProvider) return; // Prevent empty continuation
+
+    finishOnboarding({
+      provider: finalProvider,
+      planName: finalPlan,
+      isCustom,
+    });
+  };
+
+  const availablePlans = selectedProvider !== 'other' 
+    ? providers.find(p => p.name === selectedProvider)?.plans || [] 
+    : [];
 
   return (
     <div className="bg-surface min-h-screen flex flex-col overflow-x-hidden">
@@ -36,14 +91,14 @@ export default function OnboardingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12 relative">
+      <main className="flex-1 flex items-center justify-center px-4 py-12 relative overflow-hidden">
         {/* Decorative blurs */}
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-2xl w-full relative z-10">
-          {/* Brand Intro */}
-          <div className="text-center mb-12">
+          {/* Brand Intro - Only on step 1 */}
+          <div className={`text-center mb-12 transition-all duration-500 ${step === 1 ? 'opacity-100' : 'opacity-0 h-0 mb-0 overflow-hidden'}`}>
             <h1 className="font-headline font-extrabold text-5xl md:text-6xl text-primary mb-4 tracking-tight">
               Clínica
             </h1>
@@ -55,69 +110,171 @@ export default function OnboardingPage() {
             </p>
           </div>
 
-          {/* Onboarding Card */}
-          <div className="glass-card bg-surface-container-lowest rounded-[2rem] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(154,64,40,0.08)]">
-            <div className="mb-8">
-              <h2 className="font-headline text-2xl font-bold text-on-surface text-center">
-                {t('onboarding.situation_title')}
-              </h2>
-              <p className="text-on-surface-variant text-center mt-2 font-medium">
-                {t('onboarding.situation_subtitle')}
-              </p>
-            </div>
+          <div className="relative">
+            {/* Step 1: Situation */}
+            <div className={`glass-card bg-surface-container-lowest rounded-[2rem] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(154,64,40,0.08)] transition-all duration-500 absolute w-full top-0 ${step === 1 ? 'opacity-100 translate-x-0 relative' : 'opacity-0 -translate-x-full pointer-events-none'}`}>
+              <div className="mb-8">
+                <h2 className="font-headline text-2xl font-bold text-on-surface text-center">
+                  {t('onboarding.situation_title')}
+                </h2>
+                <p className="text-on-surface-variant text-center mt-2 font-medium">
+                  {t('onboarding.situation_subtitle')}
+                </p>
+              </div>
 
-            {/* Situation Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {SITUATIONS.map((s) => {
-                const isActive = selected === s.key;
-                return (
-                  <button
-                    key={s.key}
-                    onClick={() => setSelected(s.key)}
-                    className={`flex flex-col items-start p-6 rounded-xl border-2 text-left transition-all duration-300 ${
-                      isActive
-                        ? 'border-primary bg-primary/5 scale-[1.02] ring-4 ring-primary/10'
-                        : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-low'
-                    }`}
-                  >
-                    <div className={`mb-4 ${isActive ? 'text-primary' : 'text-secondary'}`}>
-                      <span
-                        className="material-symbols-outlined text-4xl"
-                        style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                      >
-                        {s.icon}
-                      </span>
-                    </div>
-                    <h3
-                      className={`font-headline font-bold text-lg leading-tight ${
-                        isActive ? 'text-primary' : 'text-on-surface'
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {SITUATIONS.map((s) => {
+                  const isActive = selectedSituation === s.key;
+                  return (
+                    <button
+                      key={s.key}
+                      onClick={() => setSelectedSituation(s.key)}
+                      className={`flex flex-col items-start p-6 rounded-xl border-2 text-left transition-all duration-300 ${
+                        isActive
+                          ? 'border-primary bg-primary/5 scale-[1.02] ring-4 ring-primary/10'
+                          : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-low'
                       }`}
                     >
-                      {t(s.labelKey)}
-                    </h3>
-                    <p className="text-sm text-on-surface-variant mt-2">{t(s.descKey)}</p>
-                  </button>
-                );
-              })}
+                      <div className={`mb-4 ${isActive ? 'text-primary' : 'text-secondary'}`}>
+                        <span className="material-symbols-outlined text-4xl" style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+                          {s.icon}
+                        </span>
+                      </div>
+                      <h3 className={`font-headline font-bold text-lg leading-tight ${isActive ? 'text-primary' : 'text-on-surface'}`}>
+                        {t(s.labelKey)}
+                      </h3>
+                      <p className="text-sm text-on-surface-variant mt-2">{t(s.descKey)}</p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-10">
+                <button
+                  onClick={handleNextStep}
+                  disabled={!selectedSituation}
+                  className={`w-full py-5 rounded-xl font-headline font-extrabold text-xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 ${
+                    selectedSituation
+                      ? 'bg-primary hover:bg-primary-container text-white shadow-primary/20 hover:-translate-y-1 active:scale-95'
+                      : 'bg-surface-container-high text-on-surface-variant/40 cursor-not-allowed shadow-none'
+                  }`}
+                >
+                  {t('onboarding.insurance_continue') || 'Continue'}
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <p className="text-center mt-6 text-on-surface-variant text-xs font-medium uppercase tracking-widest opacity-60">
+                  {t('onboarding.disclaimer')}
+                </p>
+              </div>
             </div>
 
-            {/* CTA */}
-            <div className="mt-10">
-              <button
-                onClick={handleStart}
-                disabled={!selected}
-                className={`w-full py-5 rounded-xl font-headline font-extrabold text-xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 ${
-                  selected
-                    ? 'bg-primary hover:bg-primary-container text-white shadow-primary/20 hover:-translate-y-1 active:scale-95'
-                    : 'bg-surface-container-high text-on-surface-variant/40 cursor-not-allowed shadow-none'
-                }`}
+            {/* Step 2: Insurance Info */}
+            <div className={`glass-card bg-surface-container-lowest rounded-[2rem] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(154,64,40,0.08)] transition-all duration-500 absolute w-full top-0 ${step === 2 ? 'opacity-100 translate-x-0 relative' : 'opacity-0 translate-x-full pointer-events-none'}`}>
+              <button 
+                onClick={() => setStep(1)}
+                className="absolute top-6 left-6 text-secondary hover:text-primary transition-colors flex items-center text-sm font-bold"
               >
-                {t('onboarding.cta_start')}
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span className="material-symbols-outlined mr-1">arrow_back</span>
+                Back
               </button>
-              <p className="text-center mt-6 text-on-surface-variant text-xs font-medium uppercase tracking-widest opacity-60">
-                {t('onboarding.disclaimer')}
-              </p>
+
+              <div className="mb-8 mt-4">
+                <h2 className="font-headline text-2xl font-bold text-on-surface text-center">
+                  {t('onboarding.insurance_title')}
+                </h2>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-2">
+                    {t('onboarding.insurance_provider_label')}
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedProvider}
+                      onChange={(e) => {
+                        setSelectedProvider(e.target.value);
+                        setSelectedPlan('');
+                      }}
+                      className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                    >
+                      <option value="" disabled>{t('onboarding.insurance_provider_placeholder')}</option>
+                      {providers.map((p) => (
+                        <option key={p.name} value={p.name}>{p.name}</option>
+                      ))}
+                      <option value="other">{t('onboarding.insurance_custom_provider') || 'Other / Not listed'}</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                  </div>
+                </div>
+
+                {selectedProvider === 'other' && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={t('onboarding.insurance_custom_provider')}
+                      value={customProvider}
+                      onChange={(e) => setCustomProvider(e.target.value)}
+                      className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                )}
+
+                {(availablePlans.length > 0 || selectedProvider === 'other') && (
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2">
+                      {t('onboarding.insurance_plan_label')}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={selectedPlan}
+                        onChange={(e) => setSelectedPlan(e.target.value)}
+                        className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                      >
+                        <option value="">{t('onboarding.insurance_plan_placeholder')}</option>
+                        {availablePlans.map((plan) => (
+                          <option key={plan} value={plan}>{plan}</option>
+                        ))}
+                        <option value="other">{t('onboarding.insurance_custom_plan') || 'Other / Not listed'}</option>
+                      </select>
+                      <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                    </div>
+                  </div>
+                )}
+
+                {selectedPlan === 'other' && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={t('onboarding.insurance_custom_plan')}
+                      value={customPlan}
+                      onChange={(e) => setCustomPlan(e.target.value)}
+                      className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-10 flex flex-col gap-4">
+                <button
+                  onClick={handleContinueInsurance}
+                  disabled={!selectedProvider || (selectedProvider === 'other' && !customProvider)}
+                  className={`w-full py-5 rounded-xl font-headline font-extrabold text-xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 ${
+                    selectedProvider && (selectedProvider !== 'other' || customProvider)
+                      ? 'bg-primary hover:bg-primary-container text-white shadow-primary/20 hover:-translate-y-1 active:scale-95'
+                      : 'bg-surface-container-high text-on-surface-variant/40 cursor-not-allowed shadow-none'
+                  }`}
+                >
+                  {t('onboarding.insurance_continue')}
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <button
+                  onClick={handleSkipInsurance}
+                  className="w-full py-4 rounded-xl font-bold text-secondary hover:bg-secondary/10 transition-colors"
+                >
+                  {t('onboarding.insurance_skip')}
+                </button>
+              </div>
             </div>
           </div>
         </div>

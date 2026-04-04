@@ -20,22 +20,46 @@ export default function ClinicMap({ clinics, center, activeClinicId, onMarkerCli
         className="w-full h-full"
         gestureHandling="greedy"
       >
-        {clinics.map((clinic) => (
-          <AdvancedMarker
-            key={clinic.id}
-            position={{ lat: clinic.lat, lng: clinic.lng }}
-            onClick={() => onMarkerClick?.(clinic.id)}
-            zIndex={activeClinicId === clinic.id ? 100 : 1}
-          >
-            <Pin
-              background={clinic.isFqhc ? '#9a4028' : '#14696d'}
-              borderColor={'#ffffff'}
-              glyphColor={'#ffffff'}
-              glyph={clinic.isFqhc ? '✦' : ''}
-              scale={clinic.isFqhc ? 1.4 : 1.0}
-            />
-          </AdvancedMarker>
-        ))}
+        {clinics.map((item: any) => {
+          let bg = '#14696d'; // teal default
+          let glyph = '';
+          let scale = 1.0;
+
+          if (item.isHospital) {
+            if (item.acceptsInsurance === true) {
+              bg = '#16a34a'; // green
+              glyph = '✓';
+              scale = 1.2;
+            } else if (item.acceptsInsurance === false) {
+              bg = '#dc2626'; // red
+              glyph = '✕';
+            } else {
+              bg = '#d97706'; // yellow/amber
+              glyph = '?';
+            }
+          } else if (item.isFqhc) {
+            bg = '#9a4028'; // terracotta
+            glyph = '✦';
+            scale = 1.4;
+          }
+
+          return (
+            <AdvancedMarker
+              key={item.id}
+              position={{ lat: item.lat, lng: item.lng }}
+              onClick={() => onMarkerClick?.(item.id)}
+              zIndex={activeClinicId === item.id ? 100 : 1}
+            >
+              <Pin
+                background={bg}
+                borderColor={'#ffffff'}
+                glyphColor={'#ffffff'}
+                glyph={glyph}
+                scale={scale}
+              />
+            </AdvancedMarker>
+          );
+        })}
       </Map>
     </APIProvider>
   );

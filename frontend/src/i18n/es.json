@@ -12,7 +12,16 @@
     "situation_insured": "Tengo seguro pero necesito ayuda",
     "situation_insured_desc": "Simplifica tus beneficios y navega el sistema complejo.",
     "cta_start": "Iniciar Chat",
-    "disclaimer": "Encriptado y Anónimo • Portal de Salud Seguro"
+    "disclaimer": "Encriptado y Anónimo • Portal de Salud Seguro",
+    "insurance_title": "¿Cuál es tu situación de seguro?",
+    "insurance_provider_label": "Proveedor de Seguro",
+    "insurance_provider_placeholder": "Selecciona tu proveedor",
+    "insurance_plan_label": "Nombre del Plan",
+    "insurance_plan_placeholder": "Selecciona tu plan (opcional)",
+    "insurance_custom_provider": "Escribe el nombre de tu proveedor",
+    "insurance_custom_plan": "Escribe el nombre de tu plan",
+    "insurance_skip": "Omitir por ahora",
+    "insurance_continue": "Continuar"
   },
   "chat": {
     "placeholder": "Describe tus síntomas o haz una pregunta...",
@@ -48,7 +57,8 @@
     "triage": "Triaje",
     "map": "Mapa",
     "support": "Apoyo",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "hospitals": "Hospitales"
   },
   "footer": {
     "privacy": "Política de Privacidad",
@@ -200,5 +210,31 @@
     "general_inq": "Consultas Generales",
     "after_hours": "Fuera de Horario",
     "back_map": "Volver al Mapa"
+  },
+  "hospitals": {
+    "page_title": "Encontrar Hospitales",
+    "search_placeholder": "Ingresa código postal",
+    "use_location": "Usar mi ubicación",
+    "search_button": "Buscar",
+    "edit_insurance": "Editar",
+    "add_insurance_prompt": "Agrega tu seguro para ver qué hospitales están en tu red",
+    "add_insurance_cta": "Agregar Seguro",
+    "no_results": "No se encontraron hospitales en esta área. Intenta ampliar el radio de búsqueda.",
+    "radius_label": "Radio de búsqueda",
+    "in_network": "En Red ✓",
+    "out_of_network": "Fuera de Red",
+    "coverage_unknown": "Cobertura Desconocida",
+    "open_now": "Abierto ahora",
+    "closed": "Cerrado",
+    "call": "Llamar",
+    "directions": "Cómo llegar",
+    "website": "Sitio web",
+    "modal_title": "Tu Seguro",
+    "modal_save": "Guardar y Buscar",
+    "modal_cancel": "Cancelar",
+    "home_card_title": "Encontrar Hospitales Cerca",
+    "home_card_body": "Busca hospitales que acepten tu seguro. Impulsado por Google Maps + verificación con IA.",
+    "home_card_placeholder": "Ingresa código postal",
+    "home_card_cta": "Buscar →"
   }
 }
