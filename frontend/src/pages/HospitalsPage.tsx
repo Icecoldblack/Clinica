@@ -40,13 +40,6 @@ export default function HospitalsPage() {
     }
   }, [results?.hospitals]);
 
-  // Auto-search when location changes and zip is empty
-  useEffect(() => {
-    if (userLocation && !zipCode && insuranceInfo?.provider) {
-      handleSearch();
-    }
-  }, [userLocation]); // zipCode and insuranceInfo changes might trigger unexpectedly if included without care, so keeping dependency minimal.
-
   const handleSearch = () => {
     if (!insuranceInfo?.provider) {
       setShowModal(true);
@@ -66,10 +59,45 @@ export default function HospitalsPage() {
   const handleUseLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setZipCode('');
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-          // Note: useEffect will trigger handleSearch because userLocation changes
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+          
+          let fetchedZip = '';
+          try {
+             const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+             if (apiKey) {
+               const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
+               const data = await res.json();
+               if (data.results && data.results.length > 0) {
+                 for (const result of data.results) {
+                   const zipComp = result.address_components.find((c: any) => c.types.includes('postal_code'));
+                   if (zipComp) {
+                     fetchedZip = zipComp.short_name;
+                     setZipCode(fetchedZip);
+                     break;
+                   }
+                 }
+               }
+             }
+          } catch (e) {
+             console.error("Geocoding failed", e);
+          }
+
+          if (!insuranceInfo?.provider) {
+             setShowModal(true);
+             return;
+          }
+
+          setSearchParams(fetchedZip ? { zip: fetchedZip } : {});
+          search({
+             zipCode: fetchedZip || undefined,
+             lat: fetchedZip ? undefined : latitude,
+             lng: fetchedZip ? undefined : longitude,
+             insuranceProvider: insuranceInfo.provider,
+             planName: insuranceInfo.planName,
+             radiusMiles: radius,
+          });
         },
         () => {},
         { enableHighAccuracy: false, timeout: 5000 }
@@ -131,8 +159,7 @@ export default function HospitalsPage() {
                 </div>
                 <button 
                   onClick={handleUseLocation}
-                  disabled={!!zipCode}
-                  className="px-4 bg-surface border border-outline-variant/30 rounded-xl hover:bg-surface-container transition-colors text-secondary disabled:opacity-40"
+                  className="px-4 bg-surface border border-outline-variant/30 rounded-xl hover:bg-surface-container transition-colors text-secondary"
                   title={t('hospitals.use_location')}
                 >
                   <span className="material-symbols-outlined mt-1">my_location</span>
