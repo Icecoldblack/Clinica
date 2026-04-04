@@ -23,6 +23,9 @@ export interface HospitalResult {
   insuranceNote: string | null;
   website: string | null;
   googleMapsUrl: string;
+  estimatedWaitTime: string | null;
+  matchScore: number;
+  matchReason: string;
 }
 
 export interface HospitalSearchResponse {
@@ -31,6 +34,7 @@ export interface HospitalSearchResponse {
   insuranceProvider: string;
   planName: string | null;
   totalFound: number;
+  totalInNetwork: number;
 }
 
 const FALLBACK_PROVIDERS: InsuranceProvider[] = [

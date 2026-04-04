@@ -183,7 +183,7 @@ export default function ProfilePage() {
                 {t('profile.saved_clinics')}
               </h3>
               <div className="space-y-4">
-                <div className="group cursor-pointer" onClick={() => navigate('/clinics')}>
+                <div className="group cursor-pointer" onClick={() => navigate('/hospitals')}>
                   <div className="aspect-video w-full rounded-lg overflow-hidden mb-3">
                     <img
                       src={IMG_CLINIC_1}
@@ -201,7 +201,7 @@ export default function ProfilePage() {
 
                 <div className="bg-[#f2ede9] h-[1px] w-full my-6" />
 
-                <div className="group cursor-pointer" onClick={() => navigate('/clinics')}>
+                <div className="group cursor-pointer" onClick={() => navigate('/hospitals')}>
                   <div className="aspect-video w-full rounded-lg overflow-hidden mb-3">
                     <img
                       src={IMG_CLINIC_2}
@@ -218,7 +218,7 @@ export default function ProfilePage() {
                 </div>
 
                 <button
-                  onClick={() => navigate('/clinics')}
+                  onClick={() => navigate('/hospitals')}
                   className="w-full mt-6 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 active:scale-95"
                 >
                   {t('profile.explore_more')}

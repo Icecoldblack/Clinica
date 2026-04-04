@@ -37,6 +37,11 @@ export default function HospitalCard({ hospital, isActive, onClick }: HospitalCa
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
           <span className="material-symbols-outlined text-sm">local_hospital</span>
           {hospital.type || 'Hospital'}
+          {hospital.matchScore > 0 && (
+            <span className="ml-2 bg-tertiary/10 text-tertiary px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap">
+              Match Score: {hospital.matchScore}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${insuranceBadgeClass}`}>
@@ -56,7 +61,7 @@ export default function HospitalCard({ hospital, isActive, onClick }: HospitalCa
       <p className="text-sm text-on-surface-variant mb-3">{hospital.address}</p>
 
       <div className="flex items-center gap-3 text-sm mb-4">
-        <span className="font-bold text-on-surface">{hospital.distanceMiles.toFixed(1)} mi away</span>
+        <span className="font-bold text-on-surface">{hospital.distanceMiles.toFixed(1)} {t('hospitals.miles_away')}</span>
         <span className="text-outline-variant/50">•</span>
         {hospital.isOpenNow ? (
           <span className="font-bold text-primary flex items-center gap-1">
@@ -65,14 +70,33 @@ export default function HospitalCard({ hospital, isActive, onClick }: HospitalCa
         ) : (
           <span className="font-bold text-error">{t('hospitals.closed')}</span>
         )}
+        {hospital.estimatedWaitTime && (
+          <>
+            <span className="text-outline-variant/50">•</span>
+            <span className="font-bold text-secondary flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">schedule</span> {hospital.estimatedWaitTime}
+            </span>
+          </>
+        )}
       </div>
 
       {hospital.insuranceNote && (
-        <div className="bg-primary/5 border border-primary/10 p-3 rounded-lg flex gap-3 mb-6 items-start">
-          <span className="material-symbols-outlined text-primary text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-          <p className="text-sm italic text-on-surface-variant leading-relaxed">
-            "{hospital.insuranceNote}"
-          </p>
+        <div className="bg-primary/5 border border-primary/10 p-3 rounded-lg flex flex-col gap-2 mb-6 items-start">
+          <div className="flex gap-3 items-start w-full">
+            <span className="material-symbols-outlined text-primary text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+            <p className="text-sm italic text-on-surface-variant leading-relaxed">
+              "{hospital.insuranceNote}"
+            </p>
+          </div>
+          {hospital.matchReason && (
+            <div className="mt-1 ml-8 flex flex-wrap gap-1">
+              {hospital.matchReason.split('; ').map((reason, idx) => (
+                <span key={idx} className="bg-surface-container-high text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                  {reason}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

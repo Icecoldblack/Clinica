@@ -1,14 +1,14 @@
 import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
-import type { Clinic } from '../../services/clinicService';
+import type { HospitalResult } from '../../services/insuranceService';
 
 interface ClinicMapProps {
-  clinics: Clinic[];
+  hospitals: HospitalResult[];
   center: { lat: number; lng: number };
-  activeClinicId?: string | null;
-  onMarkerClick?: (clinicId: string) => void;
+  activeHospitalId?: string | null;
+  onMarkerClick?: (id: string) => void;
 }
 
-export default function ClinicMap({ clinics, center, activeClinicId, onMarkerClick }: ClinicMapProps) {
+export default function ClinicMap({ hospitals, center, activeHospitalId, onMarkerClick }: ClinicMapProps) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   return (
@@ -20,35 +20,26 @@ export default function ClinicMap({ clinics, center, activeClinicId, onMarkerCli
         className="w-full h-full"
         gestureHandling="greedy"
       >
-        {clinics.map((item: any) => {
-          let bg = '#14696d'; // teal default
-          let glyph = '';
+        {hospitals.map((h) => {
+          let bg = '#d97706'; // amber = unknown
+          let glyph = '?';
           let scale = 1.0;
 
-          if (item.isHospital) {
-            if (item.acceptsInsurance === true) {
-              bg = '#16a34a'; // green
-              glyph = '✓';
-              scale = 1.2;
-            } else if (item.acceptsInsurance === false) {
-              bg = '#dc2626'; // red
-              glyph = '✕';
-            } else {
-              bg = '#d97706'; // yellow/amber
-              glyph = '?';
-            }
-          } else if (item.isFqhc) {
-            bg = '#9a4028'; // terracotta
-            glyph = '✦';
-            scale = 1.4;
+          if (h.acceptsInsurance === true) {
+            bg = '#16a34a'; // green
+            glyph = '✓';
+            scale = 1.2;
+          } else if (h.acceptsInsurance === false) {
+            bg = '#dc2626'; // red
+            glyph = '✕';
           }
 
           return (
             <AdvancedMarker
-              key={item.id}
-              position={{ lat: item.lat, lng: item.lng }}
-              onClick={() => onMarkerClick?.(item.id)}
-              zIndex={activeClinicId === item.id ? 100 : 1}
+              key={h.id}
+              position={{ lat: h.lat, lng: h.lng }}
+              onClick={() => onMarkerClick?.(h.id)}
+              zIndex={activeHospitalId === h.id ? 100 : 1}
             >
               <Pin
                 background={bg}

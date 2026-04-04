@@ -60,15 +60,14 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* Find Clinics suggestion */}
         {suggestClinics && (
           <div className="text-center mb-3">
             <button
-              onClick={() => navigate('/clinics')}
+              onClick={() => navigate('/hospitals')}
               className="bg-secondary text-white px-6 py-2 rounded-lg font-bold hover:bg-on-secondary-container transition-all active:scale-95 inline-flex items-center gap-2"
             >
-              <span className="material-symbols-outlined text-sm">location_on</span>
-              {t('chat.btn_find_clinics')}
+              <span className="material-symbols-outlined text-sm">local_hospital</span>
+              {t('nav.hospitals')}
             </button>
           </div>
         )}

@@ -183,7 +183,7 @@ export default function OnboardingPage() {
                 className="absolute top-6 left-6 text-secondary hover:text-primary transition-colors flex items-center text-sm font-bold"
               >
                 <span className="material-symbols-outlined mr-1">arrow_back</span>
-                Back
+                {t('onboarding.back')}
               </button>
 
               <div className="mb-8 mt-4">

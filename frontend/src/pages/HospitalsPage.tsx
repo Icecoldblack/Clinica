@@ -13,11 +13,12 @@ export default function HospitalsPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { situation, insuranceInfo, userLocation, setUserLocation } = useAppContext();
+  
   const { results, isLoading, error, search } = useHospitalSearch();
 
   const [zipCode, setZipCode] = useState(searchParams.get('zip') || '');
   const [radius, setRadius] = useState<number>(10);
-  const [activeHospitalId, setActiveHospitalId] = useState<string | null>(null);
+  const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   // Route guard
@@ -31,6 +32,20 @@ export default function HospitalsPage() {
       handleSearch();
     }
   }, []);
+
+  // Sync user location for hospitals when a zip code search returns hospitals
+  useEffect(() => {
+    if (results?.hospitals && results.hospitals.length > 0 && zipCode) {
+      setUserLocation({ lat: results.hospitals[0].lat, lng: results.hospitals[0].lng });
+    }
+  }, [results?.hospitals]);
+
+  // Auto-search when location changes and zip is empty
+  useEffect(() => {
+    if (userLocation && !zipCode && insuranceInfo?.provider) {
+      handleSearch();
+    }
+  }, [userLocation]); // zipCode and insuranceInfo changes might trigger unexpectedly if included without care, so keeping dependency minimal.
 
   const handleSearch = () => {
     if (!insuranceInfo?.provider) {
@@ -52,8 +67,9 @@ export default function HospitalsPage() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           setZipCode('');
+          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          // Note: useEffect will trigger handleSearch because userLocation changes
         },
         () => {},
         { enableHighAccuracy: false, timeout: 5000 }
@@ -66,15 +82,6 @@ export default function HospitalsPage() {
   const mapCenter = results && results.hospitals.length > 0
     ? { lat: results.hospitals[0].lat, lng: results.hospitals[0].lng }
     : { lat: userLocation?.lat ?? 33.749, lng: userLocation?.lng ?? -84.388 };
-
-  // Transform hospitals for ClinicMap compatibility
-  const mapItems = results?.hospitals.map(h => ({
-    id: h.id,
-    lat: h.lat,
-    lng: h.lng,
-    isHospital: true,
-    acceptsInsurance: h.acceptsInsurance
-  })) || [];
 
   return (
     <SidebarLayout activeNav="hospitals">
@@ -91,7 +98,7 @@ export default function HospitalsPage() {
             {insuranceInfo ? (
               <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex justify-between items-center">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Tu Seguro</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">{t('hospitals.your_insurance')}</p>
                   <p className="font-bold text-on-surface leading-tight">{insuranceInfo.provider}</p>
                   {insuranceInfo.planName && <p className="text-sm text-on-surface-variant">{insuranceInfo.planName}</p>}
                 </div>
@@ -156,7 +163,7 @@ export default function HospitalsPage() {
 
             <hr className="border-outline-variant/15 border-dashed" />
 
-            {/* Loading / Results / Empty States */}
+            {/* Loading States */}
             {isLoading && (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -165,12 +172,14 @@ export default function HospitalsPage() {
               </div>
             )}
 
+            {/* Errors */}
             {error && !isLoading && (
                <div className="text-center py-6 bg-error/5 border border-error/20 rounded-xl">
                  <p className="text-sm font-bold text-error">{error}</p>
                </div>
             )}
 
+            {/* Empty States */}
             {results && !isLoading && results.hospitals.length === 0 && (
               <div className="text-center py-10 bg-surface-container-low rounded-xl">
                 <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-3">explore_off</span>
@@ -178,32 +187,33 @@ export default function HospitalsPage() {
               </div>
             )}
 
-            {results && !isLoading && (
+            {/* Hospital Results */}
+            {results && !isLoading && results.hospitals.length > 0 && (
               <div className="space-y-4">
                 <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-60">
-                   {results.totalFound} Hospitals Found
+                   {results.totalFound} {t('hospitals.found')} • {results.totalInNetwork} {t('hospitals.in_network')}
                 </p>
                 {results.hospitals.map((h) => (
                   <HospitalCard 
                     key={h.id} 
                     hospital={h} 
-                    isActive={activeHospitalId === h.id}
-                    onClick={() => setActiveHospitalId(h.id)}
+                    isActive={activeItemId === h.id}
+                    onClick={() => setActiveItemId(h.id)}
                   />
                 ))}
               </div>
             )}
+            
           </div>
         </aside>
 
         {/* Right Panel: Map */}
         <section className="flex-1 relative">
           <ClinicMap
-            // @ts-ignore mapping generic coordinates for the map
-            clinics={mapItems}
+            hospitals={results?.hospitals || []}
             center={mapCenter}
-            activeClinicId={activeHospitalId}
-            onMarkerClick={(id) => setActiveHospitalId(id)}
+            activeHospitalId={activeItemId}
+            onMarkerClick={(id) => setActiveItemId(id)}
           />
         </section>
 
