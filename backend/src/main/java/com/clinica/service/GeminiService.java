@@ -25,7 +25,7 @@ public class GeminiService {
     public GeminiService(
             @Qualifier("geminiWebClient") WebClient geminiWebClient,
             @Value("${gemini.api.key:}") String apiKey,
-            @Value("${gemini.model:gemini-1.5-flash}") String model) {
+            @Value("${gemini.model:gemini-3-flash-preview}") String model) {
         this.geminiWebClient = geminiWebClient;
         this.apiKey = apiKey;
         this.model = model;
@@ -67,7 +67,7 @@ public class GeminiService {
                 "contents", contents,
                 "generationConfig", Map.of(
                         "temperature", 0.7,
-                        "maxOutputTokens", 400
+                        "maxOutputTokens", 1024
                 )
         );
 
@@ -132,11 +132,17 @@ public class GeminiService {
                 SITUATION: This user has indicated: %s
 
                 YOUR ROLE:
-                - Listen carefully and ask one clarifying question at a time.
                 - Provide plain-language, accessible health information. No medical jargon.
                 - Never diagnose. Never prescribe medication.
                 - Be warm, calm, and non-judgmental at all times.
-                - Keep responses under 4 sentences unless the user's concern requires more.
+
+                CONVERSATION FLOW — follow this progression:
+                1. First 1-2 exchanges: ask ONE focused clarifying question to understand the concern better.
+                2. After 2-3 exchanges, or once you have a reasonable picture of the issue: stop asking \
+                questions and shift to giving concrete, actionable guidance.
+                3. If in-person care seems appropriate, recommend finding a clinic in that same response.
+                Do NOT keep asking follow-up questions once you have enough context — the user came for \
+                help, not an endless intake form.
 
                 SITUATION-SPECIFIC INSTRUCTIONS:
                 %s
@@ -164,7 +170,7 @@ public class GeminiService {
             case "no_insurance" ->
                     "Reassure them early that there are free and sliding-scale clinics available. Focus on guiding them toward community health resources.";
             case "undocumented" ->
-                    "In your first response, reassure them that federally funded health centers (FQHCs) are legally required to serve all patients regardless of immigration status and will not report them. Repeat this reassurance if they express fear again.";
+                    "In your FIRST response only, include one brief reassurance that federally funded health centers (FQHCs) serve all patients regardless of immigration status and will not report them. After that, do NOT mention immigration status again unless the user explicitly raises it themselves.";
             case "mental_health" ->
                     "Use trauma-informed, non-stigmatizing language. Normalize seeking help. If they express crisis or self-harm, gently direct them to the 988 Suicide and Crisis Lifeline.";
             case "insured" ->
