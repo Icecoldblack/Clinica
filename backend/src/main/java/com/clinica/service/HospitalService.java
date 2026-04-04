@@ -300,16 +300,21 @@ public class HospitalService {
                     - Be helpful — an educated estimate is better than "unknown"
                     """.formatted(planDesc, hospitalList);
 
+            // Build generation config with minimal thinking to maximize output tokens
+            Map<String, Object> genConfig = new java.util.HashMap<>();
+            genConfig.put("temperature", 0.2);
+            genConfig.put("maxOutputTokens", 4096);
+            genConfig.put("thinkingConfig", Map.of("thinkingBudget", 0));
+
             Map<String, Object> requestBody = Map.of(
                     "contents", List.of(Map.of(
                             "role", "user",
                             "parts", List.of(Map.of("text", prompt))
                     )),
-                    "generationConfig", Map.of(
-                            "temperature", 0.2,
-                            "maxOutputTokens", 1200
-                    )
+                    "generationConfig", genConfig
             );
+
+            log.info("Gemini enrichment: sending prompt for {} hospitals with plan={}", hospitals.size(), planDesc);
 
             String responseJson = geminiWebClient.post()
                     .uri("/{model}:generateContent?key={key}", hospitalModel, apiKey)
@@ -318,33 +323,51 @@ public class HospitalService {
                     .bodyToMono(String.class)
                     .block();
 
+            log.info("Gemini enrichment: received response ({} chars)", responseJson != null ? responseJson.length() : 0);
             applyEnrichment(hospitals, responseJson);
+            log.info("Gemini enrichment: applied successfully");
 
         } catch (Exception e) {
-            log.warn("Gemini coverage enrichment failed (hospitals still returned): {}", e.getMessage());
+            log.warn("Gemini coverage enrichment failed (hospitals still returned): {}", e.getMessage(), e);
         }
     }
 
     private void applyEnrichment(List<Hospital> hospitals, String responseJson) throws Exception {
         JsonNode root = objectMapper.readTree(responseJson);
         JsonNode candidates = root.path("candidates");
-        if (candidates.isEmpty() || !candidates.isArray()) return;
+        if (candidates.isEmpty() || !candidates.isArray()) {
+            log.warn("Gemini enrichment: no candidates in response");
+            return;
+        }
 
         String text = candidates.get(0)
                 .path("content").path("parts").get(0).path("text").asText(null);
-        if (text == null) return;
+        if (text == null) {
+            log.warn("Gemini enrichment: text was null in response");
+            return;
+        }
+
+        log.info("Gemini enrichment raw text (first 500 chars): {}", text.substring(0, Math.min(500, text.length())));
 
         text = text.replaceAll("```json\\s*", "").replaceAll("```\\s*", "").trim();
         int start = text.indexOf('{');
         int end   = text.lastIndexOf('}');
-        if (start == -1 || end == -1) return;
+        if (start == -1 || end == -1) {
+            log.warn("Gemini enrichment: no JSON object found in text");
+            return;
+        }
 
-        JsonNode parsed = objectMapper.readTree(text.substring(start, end + 1));
+        String jsonSubstring = text.substring(start, end + 1);
+        log.info("Gemini enrichment parsed JSON (first 500 chars): {}", jsonSubstring.substring(0, Math.min(500, jsonSubstring.length())));
+        
+        JsonNode parsed = objectMapper.readTree(jsonSubstring);
         JsonNode results = parsed.path("results");
         if (!results.isArray()) {
+            log.info("Gemini enrichment: no 'results' array found. Keys present: {}", parsed.fieldNames().hasNext() ? parsed.fieldNames().next() : "none");
             // Fallback: try the old "notes" format
             JsonNode notes = parsed.path("notes");
             if (notes.isArray()) {
+                log.info("Gemini enrichment: found legacy 'notes' array with {} items", notes.size());
                 for (int i = 0; i < Math.min(notes.size(), hospitals.size()); i++) {
                     String note = notes.get(i).asText(null);
                     if (note != null && !note.isBlank()) {
@@ -354,6 +377,8 @@ public class HospitalService {
             }
             return;
         }
+
+        log.info("Gemini enrichment: found {} results for {} hospitals", results.size(), hospitals.size());
 
         for (int i = 0; i < Math.min(results.size(), hospitals.size()); i++) {
             JsonNode entry = results.get(i);

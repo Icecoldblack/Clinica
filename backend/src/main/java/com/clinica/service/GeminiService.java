@@ -62,15 +62,17 @@ public class GeminiService {
                 "parts", List.of(Map.of("text", request.getMessage()))
         ));
 
+        Map<String, Object> chatGenConfig = new java.util.HashMap<>();
+        chatGenConfig.put("temperature", 0.7);
+        chatGenConfig.put("maxOutputTokens", 4096);
+        chatGenConfig.put("thinkingConfig", Map.of("thinkingBudget", 0));
+
         Map<String, Object> requestBody = Map.of(
                 "system_instruction", Map.of(
                         "parts", List.of(Map.of("text", systemPrompt))
                 ),
                 "contents", contents,
-                "generationConfig", Map.of(
-                        "temperature", 0.7,
-                        "maxOutputTokens", 1024
-                )
+                "generationConfig", chatGenConfig
         );
 
         try {
@@ -136,12 +138,14 @@ public class GeminiService {
                 Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))
         );
 
+        Map<String, Object> summaryGenConfig = new java.util.HashMap<>();
+        summaryGenConfig.put("temperature", 0.3);
+        summaryGenConfig.put("maxOutputTokens", 2048);
+        summaryGenConfig.put("thinkingConfig", Map.of("thinkingBudget", 0));
+
         Map<String, Object> requestBody = Map.of(
                 "contents", contents,
-                "generationConfig", Map.of(
-                        "temperature", 0.3,
-                        "maxOutputTokens", 512
-                )
+                "generationConfig", summaryGenConfig
         );
 
         try {
