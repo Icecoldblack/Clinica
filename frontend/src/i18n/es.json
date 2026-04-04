@@ -35,7 +35,13 @@
     "opening_mental_health": "Hola, soy Clínica. Se necesita valentía para buscar ayuda. Cuéntame un poco sobre lo que has estado sintiendo últimamente.",
     "opening_insured": "¡Hola! Estoy aquí para ayudarte a entender tus opciones. ¿Qué está pasando con tu salud hoy?",
     "analyzing": "Clínica está analizando...",
-    "disclaimer": "Clínica IA proporciona orientación basada en datos de salud pública. Si estás experimentando una emergencia médica, llama al 911 inmediatamente."
+    "disclaimer": "Clínica IA proporciona orientación basada en datos de salud pública. Si estás experimentando una emergencia médica, llama al 911 inmediatamente.",
+    "hospitals_found": "Hospitales cercanos que pueden ayudarte:",
+    "see_all_hospitals": "Ver todos",
+    "learn_fqhc": "Sobre centros FQHC",
+    "learn_rights": "Conoce tus derechos",
+    "learn_costs": "Tarifas de escala móvil",
+    "crisis_resources": "Recursos de crisis"
   },
   "nav": {
     "home": "Inicio",

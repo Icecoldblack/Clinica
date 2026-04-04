@@ -35,6 +35,12 @@ export interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   timestamp?: string;
+  // Embedded data from AI response (model messages only)
+  hospitals?: HospitalResult[];
+  detectedCondition?: string;
+  hospitalSearchContext?: string;
+  searchInsurance?: string;
+  searchPlan?: string;
 }
 
 export interface Filters {
@@ -58,8 +64,13 @@ export interface AppState {
   userLocation: { lat: number; lng: number } | null;
   suggestClinics: boolean;
   insuranceInfo: InsuranceInfo | null;
+  age: number | null;
   sessions: TriageSession[];
   savedHospitals: SavedHospital[];
+  chatHospitalResults: HospitalResult[] | null;
+  chatHospitalContext: string | null;
+  chatSearchInsurance: string | null;
+  chatSearchPlan: string | null;
 }
 
 interface AppContextType extends AppState {
@@ -70,10 +81,13 @@ interface AppContextType extends AppState {
   setUserLocation: (coords: { lat: number; lng: number }) => void;
   setSuggestClinics: (v: boolean) => void;
   setInsuranceInfo: (info: InsuranceInfo | null) => void;
+  setAge: (age: number | null) => void;
   saveSession: (session: TriageSession) => void;
   completeSession: (sessionId: string, summary: SessionSummaryResponse) => void;
   toggleSaveHospital: (hospital: HospitalResult) => void;
   isHospitalSaved: (hospitalId: string) => boolean;
+  setChatHospitalResults: (hospitals: HospitalResult[] | null, context: string | null, insurance?: string | null, plan?: string | null) => void;
+  resetChat: () => void;
 }
 
 const SITUATION_FILTER_MAP: Record<Situation, Filters> = {
@@ -97,7 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
-  const [sessionId] = useState(() => generateId());
+  const [sessionId, _setSessionId] = useState(() => generateId());
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [filters, _setFilters] = useState<Filters>(() => (
     situation ? SITUATION_FILTER_MAP[situation] : { noInsurance: false, noDocuments: false, mentalHealth: false }
@@ -112,8 +126,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
+  const [age, _setAge] = useState<number | null>(() => {
+    try {
+      const saved = localStorage.getItem('clinica_age');
+      return saved ? parseInt(saved, 10) : null;
+    } catch { return null; }
+  });
   const [sessions, _setSessions] = useState<TriageSession[]>(loadSessions);
   const [savedHospitals, _setSavedHospitals] = useState<SavedHospital[]>(loadSavedHospitals);
+  const [chatHospitalResults, _setChatHospitalResults] = useState<HospitalResult[] | null>(null);
+  const [chatHospitalContext, _setChatHospitalContext] = useState<string | null>(null);
+  const [chatSearchInsurance, _setChatSearchInsurance] = useState<string | null>(null);
+  const [chatSearchPlan, _setChatSearchPlan] = useState<string | null>(null);
 
   const setLanguage = useCallback((lang: 'en' | 'es') => {
     _setLanguage(lang);
@@ -149,6 +173,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } else {
       localStorage.removeItem('clinica_insurance');
     }
+  }, []);
+
+  const setAge = useCallback((a: number | null) => {
+    _setAge(a);
+    if (a !== null) {
+      localStorage.setItem('clinica_age', String(a));
+    } else {
+      localStorage.removeItem('clinica_age');
+    }
+  }, []);
+
+  const setChatHospitalResults = useCallback((hospitals: HospitalResult[] | null, context: string | null, insurance?: string | null, plan?: string | null) => {
+    _setChatHospitalResults(hospitals);
+    _setChatHospitalContext(context);
+    _setChatSearchInsurance(insurance ?? null);
+    _setChatSearchPlan(plan ?? null);
+  }, []);
+
+  const resetChat = useCallback(() => {
+    _setSessionId(generateId());
+    setChatHistory([]);
+    _setSuggestClinics(false);
+    _setChatHospitalResults(null);
+    _setChatHospitalContext(null);
+    _setChatSearchInsurance(null);
+    _setChatSearchPlan(null);
   }, []);
 
   const saveSession = useCallback((session: TriageSession) => {
@@ -215,8 +265,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         userLocation,
         suggestClinics,
         insuranceInfo,
+        age,
         sessions,
         savedHospitals,
+        chatHospitalResults,
+        chatHospitalContext,
+        chatSearchInsurance,
+        chatSearchPlan,
         setLanguage,
         setSituation,
         addMessage,
@@ -224,10 +279,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setUserLocation,
         setSuggestClinics,
         setInsuranceInfo,
+        setAge,
         saveSession,
         completeSession,
         toggleSaveHospital,
         isHospitalSaved,
+        setChatHospitalResults,
+        resetChat,
       }}
     >
       {children}

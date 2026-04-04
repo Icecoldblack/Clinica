@@ -20,4 +20,15 @@ public class ChatRequest {
 
     @NotBlank(message = "Message is required")
     private String message;
+
+    // ── User profile context (passed from frontend on every request) ──
+
+    private Integer age;
+
+    private String insuranceProvider;   // e.g. "Aetna" — from onboarding
+    private String planName;            // e.g. "Aetna PPO" — from onboarding
+
+    private String zipCode;             // User's ZIP for hospital search
+    private Double lat;                 // User's latitude (geolocation)
+    private Double lng;                 // User's longitude (geolocation)
 }

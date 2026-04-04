@@ -11,10 +11,21 @@ import ChatInput from '../components/chat/ChatInput';
 export default function ChatPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { situation, chatHistory, addMessage, suggestClinics, sessionId, language, completeSession } = useAppContext();
+  const { situation, chatHistory, addMessage, suggestClinics, sessionId, language, resetChat, userLocation, setUserLocation } = useAppContext();
   const { isLoading, error, sendMessage } = useChat();
-  const [isFinishing, setIsFinishing] = useState(false);
   const seededRef = useRef(false);
+
+  // Request geolocation so embedded hospital results can be returned
+  useEffect(() => {
+    if (!userLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        () => { /* silently ignore denial */ }
+      );
+    }
+  }, [userLocation, setUserLocation]);
 
   // Seed opening message (ref prevents StrictMode double-fire)
   useEffect(() => {
@@ -30,18 +41,10 @@ export default function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [situation]);
 
-  const handleFinishSession = async () => {
-    setIsFinishing(true);
-    try {
-      const summary = await summarizeSession(sessionId, language, situation!, chatHistory);
-      completeSession(sessionId, summary);
-      navigate('/profile');
-    } catch (e) {
-      console.error(e);
-      navigate('/profile');
-    } finally {
-      setIsFinishing(false);
-    }
+  const handleNewChat = () => {
+    resetChat();
+    seededRef.current = false;
+    navigate('/', { replace: true });
   };
 
   if (!situation) return <Navigate to="/" replace />;
@@ -60,16 +63,11 @@ export default function ChatPage() {
             </p>
           </div>
           <button
-            onClick={handleFinishSession}
-            disabled={isFinishing || chatHistory.length === 0}
-            className="flex bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-5 py-2.5 rounded-lg font-bold items-center gap-2 transition-all disabled:opacity-50 active:scale-95 shadow-sm"
+            onClick={handleNewChat}
+            className="flex bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-5 py-2.5 rounded-lg font-bold items-center gap-2 transition-all active:scale-95 shadow-sm"
           >
-            {isFinishing ? (
-              <span className="material-symbols-outlined animate-spin">refresh</span>
-            ) : (
-              <span className="material-symbols-outlined">task_alt</span>
-            )}
-            {t('profile.finish_session', 'Finish Session')}
+            <span className="material-symbols-outlined">maps_ugc</span>
+            {t('chat.new_chat', 'New Chat')}
           </button>
         </div>
 

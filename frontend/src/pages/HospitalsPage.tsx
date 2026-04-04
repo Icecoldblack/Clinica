@@ -20,9 +20,17 @@ export default function HospitalsPage() {
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Initial search if zip is provided in URL and we have insurance config
+  const urlInsurance = searchParams.get('insurance');
+  const urlPlan = searchParams.get('plan');
+  const urlContext = searchParams.get('context');
+  const initialHighlight = searchParams.get('highlight');
+
+  // Initial search if zip or insurance override is provided
   useEffect(() => {
-    if (zipCode && insuranceInfo && insuranceInfo.provider) {
+    setActiveItemId(initialHighlight || null);
+    if (urlInsurance) {
+      handleSearch();
+    } else if (zipCode && insuranceInfo && insuranceInfo.provider) {
       handleSearch();
     }
   }, []);
@@ -35,17 +43,29 @@ export default function HospitalsPage() {
   }, [results?.hospitals]);
 
   const handleSearch = () => {
-    if (!insuranceInfo?.provider) {
+    const activeInsurance = urlInsurance || insuranceInfo?.provider;
+    const activePlan = urlPlan || insuranceInfo?.planName;
+
+    if (!activeInsurance) {
       setShowModal(true);
       return;
     }
-    setSearchParams(zipCode ? { zip: zipCode } : {});
+    
+    // KEEP the context parameters so they don't get lost on re-searches
+    const newParams: Record<string, string> = {};
+    if (zipCode) newParams.zip = zipCode;
+    if (urlContext) newParams.context = urlContext;
+    if (urlInsurance) newParams.insurance = urlInsurance;
+    if (urlPlan) newParams.plan = urlPlan;
+    if (initialHighlight) newParams.highlight = initialHighlight;
+    setSearchParams(newParams);
+
     search({
       zipCode: zipCode || undefined,
       lat: zipCode ? undefined : userLocation?.lat,
       lng: zipCode ? undefined : userLocation?.lng,
-      insuranceProvider: insuranceInfo.provider,
-      planName: insuranceInfo.planName,
+      insuranceProvider: activeInsurance,
+      planName: activePlan,
       radiusMiles: radius,
     });
   };
@@ -78,7 +98,7 @@ export default function HospitalsPage() {
              console.error("Geocoding failed", e);
           }
 
-          if (!insuranceInfo?.provider) {
+          if (!insuranceInfo?.provider && !urlInsurance) {
              setShowModal(true);
              return;
           }
@@ -88,8 +108,8 @@ export default function HospitalsPage() {
              zipCode: fetchedZip || undefined,
              lat: fetchedZip ? undefined : latitude,
              lng: fetchedZip ? undefined : longitude,
-             insuranceProvider: insuranceInfo.provider,
-             planName: insuranceInfo.planName,
+             insuranceProvider: urlInsurance || insuranceInfo?.provider || 'Self-pay',
+             planName: urlPlan || insuranceInfo?.planName,
              radiusMiles: radius,
           });
         },
@@ -117,7 +137,32 @@ export default function HospitalsPage() {
             </h1>
 
             {/* Insurance Context Card */}
-            {insuranceInfo ? (
+            {urlInsurance && urlContext ? (
+               <div className="bg-tertiary/10 border border-tertiary/20 rounded-xl p-4 flex flex-col">
+                  <p className="text-xs font-bold uppercase tracking-widest text-tertiary mb-1">
+                    AI Context Override
+                  </p>
+                  <p className="text-sm font-bold text-on-surface leading-tight mb-2">
+                    Searching for: <span className="text-tertiary font-black italic">{urlContext}</span>
+                  </p>
+                  <p className="text-sm font-medium text-on-surface-variant">
+                    Using insurance: <span className="font-bold">{urlInsurance}</span> {urlPlan ? `(${urlPlan})` : ''}
+                  </p>
+                  <button 
+                    onClick={() => {
+                        const p = new URLSearchParams(searchParams);
+                        p.delete('context');
+                        p.delete('insurance');
+                        p.delete('plan');
+                        setSearchParams(p);
+                        window.location.reload();
+                    }}
+                    className="mt-3 text-xs font-bold w-fit text-on-surface-variant bg-surface-container-high hover:bg-surface-container-highest px-3 py-1.5 rounded-lg active:scale-95 transition-all"
+                  >
+                    Clear Context
+                  </button>
+               </div>
+            ) : insuranceInfo ? (
               <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex justify-between items-center">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">{t('hospitals.your_insurance')}</p>
