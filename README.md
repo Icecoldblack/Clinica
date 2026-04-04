@@ -15,7 +15,8 @@ Unlike traditional health symptom checkers, Clínica leverages AI to act as a co
 
 ## ✨ Key Features
 
-- **Culturally Competent AI Triage**: An empathetic, LLM-powered chatbot (powered by Google Gemini) that provides actionable health guidance and clinic referrals tailored to the user's specific situation (e.g., uninsured, undocumented, seeking mental health support).
+- **Context-Aware Onboarding & Seamless Chat Integration**: Users select their primary concern (e.g., lack of insurance, immigration fears, mental health needs) the moment they enter the app. This context is carried directly into the chat, where the AI's core instructions, tone, and privacy assurances are dynamically reprogrammed. The system immediately "knows" their situation and adapts its resources without the user needing to re-explain themselves.
+- **Culturally Competent AI Triage**: An empathetic, LLM-powered chatbot (powered by Google Gemini) that provides actionable health guidance, crisis support, and clinic referrals tailored precisely to the user's selected onboarding situation.
 - **Intelligent Clinic Finder**: Interactive Google Maps integration that discovers nearby hospitals and clinics, filtering for safety-net providers, FQHCs, and sliding-scale fee options.
 - **Insurance-Based Hospital Scoring**: A dynamic AI-driven scoring system that evaluates and matches users to ideal hospitals based on their specific insurance provider and plan. Distinctive map markers visually indicate the most suitable facilities to guide users toward affordable, in-network care.
 - **Bilingual Experience**: Seamless, on-the-fly toggling between English and Spanish across the entire platform.
