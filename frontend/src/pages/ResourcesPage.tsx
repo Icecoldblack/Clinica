@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
@@ -9,6 +10,7 @@ const IMG_HERO_PORTRAIT = 'https://lh3.googleusercontent.com/aida-public/AB6AXuD
 
 export default function ResourcesPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { situation } = useAppContext();
 
   useEffect(() => {
@@ -25,14 +27,14 @@ export default function ResourcesPage() {
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7">
               <span className="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container text-xs font-bold tracking-widest rounded-full mb-6">
-                KNOWLEDGE HUB
+                {t('resources.badge')}
               </span>
               <h2 className="text-5xl md:text-7xl font-headline font-extrabold text-primary leading-tight mb-8">
-                Your Rights. <br />
-                <span className="text-secondary italic">Your Health.</span>
+                {t('resources.title')} <br />
+                <span className="text-secondary italic">{t('resources.subtitle')}</span>
               </h2>
               <p className="text-xl text-on-surface-variant max-w-xl leading-relaxed">
-                Navigating the healthcare system can be complex. We provide clear, culturally-grounded resources to help you advocate for yourself and your family.
+                {t('resources.desc')}
               </p>
             </div>
 
@@ -67,20 +69,20 @@ export default function ResourcesPage() {
               <div className="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined">balance</span>
               </div>
-              <h3 className="text-3xl font-headline font-bold mb-6 text-on-surface">Your Legal Rights as a Patient</h3>
+              <h3 className="text-3xl font-headline font-bold mb-6 text-on-surface">{t('resources.legal_title')}</h3>
               <ul className="space-y-4 mb-8">
                 {[
                   {
-                    title: 'Right to Informed Consent',
-                    desc: 'You have the right to understand any treatment plan in your preferred language before agreeing.',
+                    title: t('resources.legal_1_title'),
+                    desc: t('resources.legal_1_desc'),
                   },
                   {
-                    title: 'Right to Privacy (HIPAA)',
-                    desc: 'Your health information is protected and cannot be shared without your explicit permission.',
+                    title: t('resources.legal_2_title'),
+                    desc: t('resources.legal_2_desc'),
                   },
                   {
-                    title: 'Right to Emergency Care',
-                    desc: 'Hospitals must stabilize you in an emergency regardless of your ability to pay.',
+                    title: t('resources.legal_3_title'),
+                    desc: t('resources.legal_3_desc'),
                   },
                 ].map((item) => (
                   <li key={item.title} className="flex items-start gap-4">
@@ -93,7 +95,7 @@ export default function ResourcesPage() {
                 ))}
               </ul>
               <button className="text-primary font-bold flex items-center gap-2 hover:underline">
-                Download Full Patient Rights Guide
+                {t('resources.download_guide')}
                 <span className="material-symbols-outlined text-sm">download</span>
               </button>
             </div>
@@ -105,14 +107,14 @@ export default function ResourcesPage() {
               <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined">security</span>
               </div>
-              <h3 className="text-2xl font-headline font-bold mb-4">How FQHCs Protect You</h3>
+              <h3 className="text-2xl font-headline font-bold mb-4">{t('resources.fqhc_title')}</h3>
               <p className="text-on-secondary/80 text-sm leading-relaxed mb-6">
-                Federally Qualified Health Centers (FQHCs) are safety-net providers that offer care on a sliding scale. They are mandated to serve everyone, regardless of insurance or immigration status.
+                {t('resources.fqhc_desc')}
               </p>
             </div>
             <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-xs font-bold tracking-widest uppercase mb-2 opacity-60">DID YOU KNOW?</p>
-              <p className="text-sm">FQHCs are strictly prohibited from reporting patient information to immigration authorities.</p>
+              <p className="text-xs font-bold tracking-widest uppercase mb-2 opacity-60">{t('resources.did_you_know')}</p>
+              <p className="text-sm">{t('resources.fqhc_fact')}</p>
             </div>
           </div>
         </section>
@@ -121,8 +123,8 @@ export default function ResourcesPage() {
         <section className="mb-24">
           <div className="flex justify-between items-end mb-10">
             <div>
-              <h3 className="text-4xl font-headline font-extrabold text-on-surface mb-2">Resource Library</h3>
-              <p className="text-on-surface-variant">Guides and toolkits designed for your journey.</p>
+              <h3 className="text-4xl font-headline font-extrabold text-on-surface mb-2">{t('resources.library_title')}</h3>
+              <p className="text-on-surface-variant">{t('resources.library_subtitle')}</p>
             </div>
             <div className="hidden md:flex gap-2">
               <button className="p-2 border border-outline-variant rounded-full text-outline hover:bg-surface-container transition-colors">
@@ -137,39 +139,39 @@ export default function ResourcesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                title: 'Finding Care Without Insurance',
-                type: 'PDF GUIDE • 1.2 MB',
-                desc: 'A step-by-step manual on sliding scale fees and charity care programs.',
+                title: t('resources.lib_1_title'),
+                type: t('resources.lib_1_type'),
+                desc: t('resources.lib_1_desc'),
                 icon: 'description',
                 gradient: 'from-primary to-primary-container',
-                action: 'Download Now',
+                action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
               },
               {
-                title: 'Navigating Immigration & Health',
-                type: 'PDF GUIDE • 2.4 MB',
-                desc: "Safe access to medical care and understanding the 'Public Charge' rule.",
+                title: t('resources.lib_2_title'),
+                type: t('resources.lib_2_type'),
+                desc: t('resources.lib_2_desc'),
                 icon: 'translate',
                 gradient: 'from-secondary to-on-secondary-container',
-                action: 'Download Now',
+                action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
               },
               {
-                title: 'Understanding Your Medical Bill',
-                type: 'TOOLKIT • 0.8 MB',
-                desc: 'How to read billing codes and negotiate hospital charges.',
+                title: t('resources.lib_3_title'),
+                type: t('resources.lib_3_type'),
+                desc: t('resources.lib_3_desc'),
                 icon: 'medical_information',
                 gradient: 'from-tertiary to-tertiary-container',
-                action: 'Download Now',
+                action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
               },
               {
-                title: 'Advocating for Family Members',
-                type: 'VIDEO SERIES • LINK',
-                desc: 'Tips on being an effective health advocate for elderly or non-English speaking relatives.',
+                title: t('resources.lib_4_title'),
+                type: t('resources.lib_4_type'),
+                desc: t('resources.lib_4_desc'),
                 icon: 'record_voice_over',
                 gradient: 'from-inverse-surface to-on-surface',
-                action: 'Watch Now',
+                action: t('resources.btn_watch'),
                 actionIcon: 'play_circle',
               },
             ].map((card) => (
@@ -200,9 +202,9 @@ export default function ResourcesPage() {
         <section className="bg-primary-fixed text-on-primary-fixed p-12 rounded-3xl text-center relative overflow-hidden mb-12">
           <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h3 className="text-3xl font-headline font-bold mb-4">Need immediate assistance?</h3>
+            <h3 className="text-3xl font-headline font-bold mb-4">{t('resources.help_title')}</h3>
             <p className="mb-8 opacity-90">
-              Our health navigators are available to help you understand your options and find the right care at no cost to you.
+              {t('resources.help_desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -210,7 +212,7 @@ export default function ResourcesPage() {
                 className="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95"
               >
                 <span className="material-symbols-outlined">chat</span>
-                Chat with a Navigator
+                {t('resources.chat_navigator')}
               </button>
               <button className="bg-white text-primary px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-surface-container transition-all">
                 <span className="material-symbols-outlined">call</span>

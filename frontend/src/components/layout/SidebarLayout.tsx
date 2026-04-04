@@ -16,10 +16,10 @@ const NAV_ITEMS = [
 ];
 
 const MOBILE_ITEMS = [
-  { key: 'home', icon: 'home', label: 'Home', path: '/home' },
-  { key: 'chat', icon: 'medical_services', label: 'Triage', path: '/chat' },
-  { key: 'clinics', icon: 'location_on', label: 'Map', path: '/clinics' },
-  { key: 'resources', icon: 'contact_support', label: 'Support', path: '/resources' },
+  { key: 'home', icon: 'home', path: '/home' },
+  { key: 'chat', icon: 'medical_services', path: '/chat' },
+  { key: 'clinics', icon: 'location_on', path: '/clinics' },
+  { key: 'resources', icon: 'contact_support', path: '/resources' },
 ];
 
 export default function SidebarLayout({ children, activeNav }: SidebarLayoutProps) {
@@ -100,7 +100,7 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
             }`}
           >
             <span className="material-symbols-outlined">person</span>
-            <span className="font-body font-medium text-sm">Profile</span>
+            <span className="font-body font-medium text-sm">{t('nav.profile')}</span>
           </NavLink>
         </div>
       </aside>
@@ -140,6 +140,12 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
       <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-surface/80 backdrop-blur-xl border-t border-primary/10 shadow-[0_-4px_24px_rgba(154,64,40,0.08)] rounded-t-3xl">
         {MOBILE_ITEMS.map((item) => {
           const isActive = currentNav === item.key;
+          const labelMap: Record<string, string> = {
+            home: t('nav.home'),
+            chat: t('nav.triage'),
+            clinics: t('nav.map'),
+            resources: t('nav.support'),
+          };
           return (
             <button
               key={item.key}
@@ -156,7 +162,7 @@ export default function SidebarLayout({ children, activeNav }: SidebarLayoutProp
               >
                 {item.icon}
               </span>
-              <span className="font-body text-[11px] font-semibold">{item.label}</span>
+              <span className="font-body text-[11px] font-semibold">{labelMap[item.key]}</span>
             </button>
           );
         })}

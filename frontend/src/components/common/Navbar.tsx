@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from './LanguageToggle';
-import { useAppContext } from '../../context/AppContext';
 
 interface NavbarProps {
   showFindClinics?: boolean;
@@ -12,7 +11,6 @@ interface NavbarProps {
 export default function Navbar({ showFindClinics = false, clinicsActive = false, suggestPulse = false }: NavbarProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const { chatHistory } = useAppContext();
 
   const isMapPage = location.pathname === '/clinics';
 

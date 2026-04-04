@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
@@ -10,6 +11,7 @@ const IMG_USER_HEADER = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbA
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { situation, chatHistory } = useAppContext();
 
   useEffect(() => {
@@ -19,10 +21,10 @@ export default function ProfilePage() {
   if (!situation) return null;
 
   const situationLabel: Record<string, string> = {
-    no_insurance: 'No Insurance',
-    undocumented: 'Immigration Concerns',
-    mental_health: 'Mental Health Support',
-    insured: 'Insured',
+    no_insurance: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_no_insurance') ? t('home.sit_no_insurance') : 'No Insurance',
+    undocumented: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_undocumented') ? t('home.sit_undocumented') : 'Immigration Concerns',
+    mental_health: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_mental_health') ? t('home.sit_mental_health') : 'Mental Health Support',
+    insured: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_insured') ? t('home.sit_insured') : 'Insured – Needs Help',
   };
 
   return (
@@ -33,10 +35,10 @@ export default function ProfilePage() {
           <div className="lg:col-span-8">
             {/* Header */}
             <div className="mb-12">
-              <span className="text-tertiary font-bold tracking-widest uppercase text-xs mb-2 block">Welcome Back</span>
-              <h2 className="text-5xl font-extrabold text-primary tracking-tight leading-none mb-4">Your Health Journey</h2>
+              <span className="text-tertiary font-bold tracking-widest uppercase text-xs mb-2 block">{t('profile.welcome_back')}</span>
+              <h2 className="text-5xl font-extrabold text-primary tracking-tight leading-none mb-4">{t('profile.title')}</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">
-                Review your previous triage sessions and find saved care locations near you.
+                {t('profile.subtitle')}
               </p>
             </div>
 
@@ -50,18 +52,18 @@ export default function ProfilePage() {
                   <span className="p-2 bg-primary/10 rounded-lg">
                     <span className="material-symbols-outlined text-primary">verified_user</span>
                   </span>
-                  <h3 className="text-2xl font-bold">Current Situation</h3>
+                  <h3 className="text-2xl font-bold">{t('profile.current_situation')}</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-surface-container-lowest p-5 rounded-lg border-b-2 border-secondary">
-                    <p className="text-sm text-on-surface-variant mb-1 font-label uppercase tracking-tighter">Insurance Status</p>
+                    <p className="text-sm text-on-surface-variant mb-1 font-label uppercase tracking-tighter">{t('profile.insurance_status')}</p>
                     <p className="text-xl font-bold text-primary">{situationLabel[situation] || situation}</p>
-                    <p className="text-xs text-secondary mt-2">Qualified for Sliding Scale Fees</p>
+                    <p className="text-xs text-secondary mt-2">{t('profile.qualified')}</p>
                   </div>
                   <div className="bg-surface-container-lowest p-5 rounded-lg">
-                    <p className="text-sm text-on-surface-variant mb-1 font-label uppercase tracking-tighter">Primary Need</p>
-                    <p className="text-xl font-bold">Community Health Triage</p>
-                    <p className="text-xs text-on-surface-variant/60 mt-2">Active session</p>
+                    <p className="text-sm text-on-surface-variant mb-1 font-label uppercase tracking-tighter">{t('profile.primary_need')}</p>
+                    <p className="text-xl font-bold">{t('profile.primary_triage')}</p>
+                    <p className="text-xs text-on-surface-variant/60 mt-2">{t('profile.active_session')}</p>
                   </div>
                 </div>
               </div>
@@ -70,9 +72,9 @@ export default function ProfilePage() {
             {/* Chat History */}
             <div>
               <div className="flex justify-between items-end mb-8">
-                <h3 className="text-3xl font-bold text-secondary">Chat History</h3>
+                <h3 className="text-3xl font-bold text-secondary">{t('profile.chat_history')}</h3>
                 <button className="text-primary font-bold text-sm hover:underline">
-                  View All Sessions
+                  {t('profile.view_all')}
                 </button>
               </div>
 
@@ -81,16 +83,15 @@ export default function ProfilePage() {
                   <div className="bg-surface-container-lowest rounded-xl p-6 shadow-[0_32px_32px_-4px_rgba(27,28,27,0.06)] border-l-4 border-primary transition-transform hover:scale-[1.01] cursor-pointer">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="text-xs font-bold text-tertiary uppercase tracking-widest mb-1">Current Session</p>
-                        <h4 className="text-xl font-bold">Active Triage Session</h4>
+                        <p className="text-xs font-bold text-tertiary uppercase tracking-widest mb-1">{t('profile.current_situation')}</p>
+                        <h4 className="text-xl font-bold">{t('profile.session_title')}</h4>
                       </div>
                       <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">
-                        Active
+                        {t('profile.active_badge')}
                       </span>
                     </div>
                     <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">
-                      {chatHistory.length} messages in current session.{' '}
-                      {chatHistory.filter((m) => m.role === 'user').length} user messages.
+                      {chatHistory.length} {t('profile.messages_in')} {chatHistory.filter((m) => m.role === 'user').length} {t('profile.user_messages')}
                     </p>
                     <div className="flex items-center gap-4">
                       <button
@@ -98,7 +99,7 @@ export default function ProfilePage() {
                         className="flex items-center gap-2 text-sm font-bold text-secondary"
                       >
                         <span className="material-symbols-outlined text-sm">chat</span>
-                        Resume Chat
+                        {t('profile.resume_chat')}
                       </button>
                     </div>
                   </div>
@@ -108,26 +109,26 @@ export default function ProfilePage() {
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <p className="text-xs font-bold text-tertiary uppercase tracking-widest mb-1">Oct 12, 2023</p>
-                        <h4 className="text-xl font-bold">Respiratory &amp; Fever Triage</h4>
+                        <h4 className="text-xl font-bold">{t('profile.completed_title')}</h4>
                       </div>
                       <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">
-                        Completed
+                        {t('profile.completed_badge')}
                       </span>
                     </div>
                     <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">
-                      Discussion regarding moderate cough and elevated temperature. Guidance provided on low-cost urgent care clinics in the East Side area with Spanish-speaking staff.
+                      {t('profile.completed_desc')}
                     </p>
                     <div className="flex items-center gap-4">
                       <button className="flex items-center gap-2 text-sm font-bold text-primary">
                         <span className="material-symbols-outlined text-sm">description</span>
-                        Download Summary
+                        {t('profile.download_summary')}
                       </button>
                       <button
                         onClick={() => navigate('/chat')}
                         className="flex items-center gap-2 text-sm font-bold text-secondary"
                       >
                         <span className="material-symbols-outlined text-sm">chat</span>
-                        Resume Chat
+                        {t('profile.resume_chat')}
                       </button>
                     </div>
                   </div>
@@ -138,19 +139,19 @@ export default function ProfilePage() {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="text-xs font-bold text-on-surface-variant/50 uppercase tracking-widest mb-1">Sep 28, 2023</p>
-                      <h4 className="text-xl font-bold">Pediatric Immunization Inquiry</h4>
+                      <h4 className="text-xl font-bold">{t('profile.archived_title')}</h4>
                     </div>
                     <span className="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-xs font-bold">
-                      Archived
+                      {t('profile.archived_badge')}
                     </span>
                   </div>
                   <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">
-                    Inquiry about no-cost vaccination schedules for school enrollment. Recommended contacting the County Health Department mobile units.
+                    {t('profile.archived_desc')}
                   </p>
                   <div className="flex items-center gap-4">
                     <button className="flex items-center gap-2 text-sm font-bold text-primary/60">
                       <span className="material-symbols-outlined text-sm">description</span>
-                      Download Summary
+                      {t('profile.download_summary')}
                     </button>
                   </div>
                 </div>
@@ -170,8 +171,8 @@ export default function ProfilePage() {
                 />
               </div>
               <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Welcome Back</p>
-                <p className="font-bold text-on-surface">Verified Member</p>
+                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">{t('profile.welcome_back')}</p>
+                <p className="font-bold text-on-surface">{t('profile.member_type')}</p>
               </div>
             </div>
 
@@ -179,7 +180,7 @@ export default function ProfilePage() {
             <div className="bg-surface-container-low rounded-xl p-6 shadow-[0_32px_32px_-4px_rgba(27,28,27,0.06)]">
               <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <span className="material-symbols-outlined text-tertiary">bookmark</span>
-                Saved Clinics
+                {t('profile.saved_clinics')}
               </h3>
               <div className="space-y-4">
                 <div className="group cursor-pointer" onClick={() => navigate('/clinics')}>
@@ -191,10 +192,10 @@ export default function ProfilePage() {
                     />
                   </div>
                   <h4 className="font-bold text-lg group-hover:text-primary transition-colors">St. Jude Community Care</h4>
-                  <p className="text-sm text-on-surface-variant mb-2">1.2 miles away • Open Now</p>
+                  <p className="text-sm text-on-surface-variant mb-2">1.2 miles away • {t('profile.open_now')}</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">Sliding Scale</span>
-                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">Walk-in</span>
+                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">{t('profile.tag_sliding')}</span>
+                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">{t('profile.tag_walkin')}</span>
                   </div>
                 </div>
 
@@ -209,10 +210,10 @@ export default function ProfilePage() {
                     />
                   </div>
                   <h4 className="font-bold text-lg group-hover:text-primary transition-colors">La Familia Medical Center</h4>
-                  <p className="text-sm text-on-surface-variant mb-2">2.5 miles away • Closes 5PM</p>
+                  <p className="text-sm text-on-surface-variant mb-2">2.5 miles away • {t('profile.closes')}</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">Spanish Speaking</span>
-                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">Pharmacy</span>
+                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">{t('profile.tag_spanish')}</span>
+                    <span className="bg-secondary/10 text-secondary text-[10px] font-bold uppercase px-2 py-0.5 rounded">{t('profile.tag_pharmacy')}</span>
                   </div>
                 </div>
 
@@ -220,7 +221,7 @@ export default function ProfilePage() {
                   onClick={() => navigate('/clinics')}
                   className="w-full mt-6 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 active:scale-95"
                 >
-                  Explore More Clinics
+                  {t('profile.explore_more')}
                 </button>
               </div>
             </div>
@@ -228,15 +229,15 @@ export default function ProfilePage() {
             {/* Need Help CTA */}
             <div className="p-6 bg-secondary text-white rounded-xl relative overflow-hidden">
               <div className="relative z-10">
-                <h4 className="text-xl font-bold mb-2">Need immediate help?</h4>
+                <h4 className="text-xl font-bold mb-2">{t('profile.need_help')}</h4>
                 <p className="text-sm opacity-80 mb-4">
-                  Start a new triage session and get personalized clinic recommendations in minutes.
+                  {t('profile.need_help_desc')}
                 </p>
                 <button
                   onClick={() => navigate('/chat')}
                   className="bg-tertiary text-on-tertiary-fixed font-bold px-6 py-2 rounded-lg active:scale-95 transition-transform"
                 >
-                  New Triage
+                  {t('profile.new_triage')}
                 </button>
               </div>
               <div className="absolute -bottom-4 -right-4 opacity-20">

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
 
@@ -12,6 +13,7 @@ const IMG_USER_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvd
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { situation } = useAppContext();
 
   useEffect(() => {
@@ -21,10 +23,10 @@ export default function HomePage() {
   if (!situation) return null;
 
   const situationLabel: Record<string, string> = {
-    no_insurance: 'No Insurance',
-    undocumented: 'Immigration Concerns',
-    mental_health: 'Mental Health Support',
-    insured: 'Insured – Needs Help',
+    no_insurance: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_no_insurance') ? t('home.sit_no_insurance') : 'No Insurance',
+    undocumented: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_undocumented') ? t('home.sit_undocumented') : 'Immigration Concerns',
+    mental_health: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_mental_health') ? t('home.sit_mental_health') : 'Mental Health Support',
+    insured: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_insured') ? t('home.sit_insured') : 'Insured – Needs Help',
   };
 
   return (
@@ -41,17 +43,17 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent" />
           <div className="relative z-10 p-8 lg:p-16 flex flex-col items-start max-w-2xl">
             <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4 tracking-tight">
-              Welcome to Clínica.<br />
-              Your Health, Your Language.
+              {t('home.welcome_title')}<br />
+              {t('home.welcome_subtitle')}
             </h2>
             <p className="text-white/90 text-lg mb-8 font-medium">
-              Access community clinics and medical resources tailored for your needs.
+              {t('home.welcome_text')}
             </p>
             <button
               onClick={() => navigate('/profile')}
               className="bg-surface-container-lowest text-primary px-8 py-3 rounded-lg font-bold shadow-xl shadow-black/10 hover:bg-surface-bright transition-all active:scale-95"
             >
-              View Records
+              {t('home.btn_view_records')}
             </button>
           </div>
         </section>
@@ -65,17 +67,17 @@ export default function HomePage() {
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
                   medical_services
                 </span>
-                Priority Tool
+                {t('home.bento_ai_badge')}
               </div>
-              <h3 className="font-headline text-3xl font-extrabold text-on-surface">Start AI Triage</h3>
+              <h3 className="font-headline text-3xl font-extrabold text-on-surface">{t('home.bento_ai_title')}</h3>
               <p className="text-on-surface-variant leading-relaxed">
-                Check your symptoms in under 2 minutes. We'll guide you to the right care based on your situation.
+                {t('home.bento_ai_desc')}
               </p>
               <button
                 onClick={() => navigate('/chat')}
                 className="mt-4 flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary-container transition-all active:scale-95"
               >
-                Begin Assessment
+                {t('home.bento_ai_btn')}
                 <span className="material-symbols-outlined">arrow_forward</span>
               </button>
             </div>
@@ -95,21 +97,21 @@ export default function HomePage() {
           {/* Insurance Status */}
           <div className="md:col-span-4 bg-error-container/20 rounded-xl p-8 border border-error/10 flex flex-col justify-between">
             <div>
-              <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Insurance Profile</h4>
+              <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">{t('home.bento_profile_title')}</h4>
               <p className="text-xl font-headline font-bold text-error">
-                Current Situation:<br />
+                {t('home.bento_profile_current')}<br />
                 {situationLabel[situation] || situation}
               </p>
             </div>
             <div className="mt-8 space-y-3">
               <p className="text-sm text-on-surface-variant">
-                Don't worry. You can still access care at FQHC clinics.
+                {t('home.bento_profile_desc')}
               </p>
               <button
                 onClick={() => navigate('/')}
                 className="flex items-center gap-2 text-primary font-bold text-sm group"
               >
-                Update Status
+                {t('home.bento_profile_update')}
                 <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">edit</span>
               </button>
             </div>
@@ -119,9 +121,9 @@ export default function HomePage() {
           <div className="md:col-span-6 bg-surface-container-low rounded-xl overflow-hidden shadow-sm border border-outline-variant/15">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-headline text-xl font-bold">Nearby Clinics</h3>
+                <h3 className="font-headline text-xl font-bold">{t('home.bento_clinics_title')}</h3>
                 <button onClick={() => navigate('/clinics')} className="text-secondary font-bold text-sm">
-                  View on Map
+                  {t('home.bento_clinics_view')}
                 </button>
               </div>
               <div className="space-y-4">
@@ -131,9 +133,9 @@ export default function HomePage() {
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-on-surface">Community Health East</p>
-                    <p className="text-xs text-on-surface-variant">1.2 miles • FQHC Certified</p>
+                    <p className="text-xs text-on-surface-variant">{t('home.bento_clinics_dist1')}</p>
                   </div>
-                  <span className="text-xs font-bold text-secondary">Open</span>
+                  <span className="text-xs font-bold text-secondary">{t('home.bento_clinics_open')}</span>
                 </div>
                 <div className="flex items-start gap-4 p-4 bg-surface-container-lowest rounded-lg">
                   <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
@@ -141,9 +143,9 @@ export default function HomePage() {
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-on-surface">Mission District Medical</p>
-                    <p className="text-xs text-on-surface-variant">2.8 miles • Sliding Scale</p>
+                    <p className="text-xs text-on-surface-variant">{t('home.bento_clinics_dist2')}</p>
                   </div>
-                  <span className="text-xs font-bold text-tertiary">Closing soon</span>
+                  <span className="text-xs font-bold text-tertiary">{t('home.bento_clinics_closing')}</span>
                 </div>
               </div>
             </div>
@@ -169,12 +171,12 @@ export default function HomePage() {
               className="bg-surface rounded-xl p-6 border border-outline-variant/20 shadow-sm flex gap-6 items-center text-left hover:shadow-lg transition-all"
             >
               <div className="flex-1">
-                <h4 className="font-headline font-bold text-lg text-primary mb-1">Know Your Rights</h4>
+                <h4 className="font-headline font-bold text-lg text-primary mb-1">{t('home.bento_rights_title')}</h4>
                 <p className="text-sm text-on-surface-variant mb-3">
-                  Understand healthcare privacy and access laws for everyone.
+                  {t('home.bento_rights_desc')}
                 </p>
                 <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1">
-                  Read Guide <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  {t('home.bento_rights_btn')} <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </span>
               </div>
               <div className="w-24 h-24 bg-primary/5 rounded-lg overflow-hidden flex-shrink-0">
@@ -191,12 +193,12 @@ export default function HomePage() {
               className="bg-surface rounded-xl p-6 border border-outline-variant/20 shadow-sm flex gap-6 items-center text-left hover:shadow-lg transition-all"
             >
               <div className="flex-1">
-                <h4 className="font-headline font-bold text-lg text-primary mb-1">How FQHCs Protect You</h4>
+                <h4 className="font-headline font-bold text-lg text-primary mb-1">{t('home.bento_fqhc_title')}</h4>
                 <p className="text-sm text-on-surface-variant mb-3">
-                  Federally Qualified Health Centers provide safe care regardless of status.
+                  {t('home.bento_fqhc_desc')}
                 </p>
                 <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1">
-                  Learn More <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  {t('home.bento_fqhc_btn')} <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </span>
               </div>
               <div className="w-24 h-24 bg-secondary/5 rounded-lg overflow-hidden flex-shrink-0">
@@ -215,9 +217,9 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
             </div>
             <div>
-              <h5 className="font-headline font-bold text-xl text-on-tertiary-fixed-variant">Your Privacy is Our Priority</h5>
+              <h5 className="font-headline font-bold text-xl text-on-tertiary-fixed-variant">{t('home.safety_title')}</h5>
               <p className="text-on-tertiary-fixed-variant opacity-80">
-                Federal law prohibits health centers from sharing your personal information with authorities. Your health data is encrypted and protected under HIPAA and federal statutes.
+                {t('home.safety_desc')}
               </p>
             </div>
           </div>
