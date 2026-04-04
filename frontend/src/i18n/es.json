@@ -1,0 +1,57 @@
+{
+  "onboarding": {
+    "tagline": "Tu navegador de salud. En tu idioma.",
+    "situation_title": "¿Cómo podemos ayudarte hoy?",
+    "situation_subtitle": "Selecciona la opción que mejor describe tu situación",
+    "situation_no_insurance": "No tengo seguro médico",
+    "situation_no_insurance_desc": "Encuentra clínicas asequibles y apoyo cerca de ti.",
+    "situation_undocumented": "Me preocupa mi estatus migratorio",
+    "situation_undocumented_desc": "Recibe atención confidencial sin temor a repercusiones legales.",
+    "situation_mental_health": "Necesito apoyo de salud mental",
+    "situation_mental_health_desc": "Conéctate con terapeutas que comprenden tu cultura.",
+    "situation_insured": "Tengo seguro pero necesito ayuda",
+    "situation_insured_desc": "Simplifica tus beneficios y navega el sistema complejo.",
+    "cta_start": "Iniciar Chat",
+    "disclaimer": "Encriptado y Anónimo • Portal de Salud Seguro"
+  },
+  "chat": {
+    "placeholder": "Describe tus síntomas o haz una pregunta...",
+    "btn_send": "Enviar",
+    "btn_find_clinics": "Buscar Clínicas",
+    "title": "Triaje de Salud",
+    "subtitle": "Cuéntanos cómo te sientes. Nuestro guía de IA te ayuda a encontrar la atención adecuada al instante.",
+    "opening_no_insurance": "Hola, soy Clínica. Estoy aquí para ayudarte a encontrar atención asequible, con o sin seguro. ¿Qué te está pasando hoy?",
+    "opening_undocumented": "Hola. Todo lo que compartas aquí es privado. Estoy aquí para ayudarte a encontrar atención segura. ¿Qué te está pasando?",
+    "opening_mental_health": "Hola, soy Clínica. Se necesita valentía para buscar ayuda. Cuéntame un poco sobre lo que has estado sintiendo últimamente.",
+    "opening_insured": "¡Hola! Estoy aquí para ayudarte a entender tus opciones. ¿Qué está pasando con tu salud hoy?",
+    "analyzing": "Clínica está analizando...",
+    "disclaimer": "Clínica IA proporciona orientación basada en datos de salud pública. Si estás experimentando una emergencia médica, llama al 911 inmediatamente."
+  },
+  "map": {
+    "filter_title": "Filtros",
+    "filter_clear": "Limpiar todo",
+    "filter_no_insurance": "Sin Seguro",
+    "filter_no_documents": "Sin Documentos",
+    "filter_mental_health": "Salud Mental",
+    "callout_title": "Tu seguridad está protegida por ley federal",
+    "callout_body": "Todas las clínicas marcadas con ✦ son Centros de Salud Calificados Federalmente (FQHCs). Por ley, deben atender a todos los pacientes sin importar su seguro o estatus migratorio. No te reportarán.",
+    "card_directions": "Cómo Llegar",
+    "card_phone": "Llamar",
+    "search_placeholder": "Buscar vecindario o código postal...",
+    "clinics_nearby": "Clínicas Cercanas"
+  },
+  "nav": {
+    "home": "Inicio",
+    "chat": "Chat",
+    "find_clinics": "Buscar Clínicas",
+    "resources": "Recursos",
+    "triage": "Triaje",
+    "map": "Mapa",
+    "support": "Apoyo"
+  },
+  "footer": {
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "copyright": "© 2026 Clínica Navegación de Salud. Empoderando Comunidades Hispanas."
+  }
+}

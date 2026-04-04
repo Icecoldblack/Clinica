@@ -1,0 +1,57 @@
+{
+  "onboarding": {
+    "tagline": "Your health navigator. In your language.",
+    "situation_title": "How can we help you today?",
+    "situation_subtitle": "Select the option that best describes your situation",
+    "situation_no_insurance": "I don't have health insurance",
+    "situation_no_insurance_desc": "Find affordable clinics and support near you.",
+    "situation_undocumented": "I'm worried about my status",
+    "situation_undocumented_desc": "Get confidential care without fear of legal repercussions.",
+    "situation_mental_health": "I need mental health support",
+    "situation_mental_health_desc": "Connect with therapists who understand your culture.",
+    "situation_insured": "I have insurance but need help",
+    "situation_insured_desc": "Simplify your benefits and navigate the complex system.",
+    "cta_start": "Start Chat",
+    "disclaimer": "Encrypted & Anonymous • Secure Health Portal"
+  },
+  "chat": {
+    "placeholder": "Describe your symptoms or ask a question...",
+    "btn_send": "Send",
+    "btn_find_clinics": "Find Clinics",
+    "title": "Health Triage",
+    "subtitle": "Tell us how you're feeling. Our AI guide helps you find the right care instantly.",
+    "opening_no_insurance": "Hi, I'm Clínica. I'm here to help you find affordable care, with or without insurance. What's going on today?",
+    "opening_undocumented": "Hi. Everything you share here is private. I'm here to help you find safe care. What's going on?",
+    "opening_mental_health": "Hi, I'm Clínica. It takes courage to reach out. Tell me a little about what you've been feeling lately.",
+    "opening_insured": "Hi! I'm here to help you understand your options. What's going on with your health today?",
+    "analyzing": "Clínica is analyzing...",
+    "disclaimer": "Clínica AI provides guidance based on public health data. If you are experiencing a medical emergency, please call 911 immediately."
+  },
+  "map": {
+    "filter_title": "Filters",
+    "filter_clear": "Clear all",
+    "filter_no_insurance": "No Insurance",
+    "filter_no_documents": "No Documents",
+    "filter_mental_health": "Mental Health",
+    "callout_title": "Your safety is protected by federal law",
+    "callout_body": "All clinics marked ✦ are Federally Qualified Health Centers (FQHCs). By law, they must serve all patients regardless of insurance or immigration status. They will not report you.",
+    "card_directions": "Get Directions",
+    "card_phone": "Call",
+    "search_placeholder": "Search neighborhood or zip code...",
+    "clinics_nearby": "Clinics Nearby"
+  },
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "find_clinics": "Find Clinics",
+    "resources": "Resources",
+    "triage": "Triage",
+    "map": "Map",
+    "support": "Support"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 Clínica Health Navigation. Empowering Hispanic Communities."
+  }
+}

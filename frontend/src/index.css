@@ -5,9 +5,9 @@
 /* ─── Base Styles ─── */
 body {
   margin: 0;
-  font-family: 'Public Sans', sans-serif;
-  background-color: #f8f9fa;
-  color: #191c1d;
+  font-family: 'Inter', sans-serif;
+  background-color: #fcf9f7;
+  color: #1b1c1b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -29,22 +29,56 @@ h1, h2, h3, h4 {
   direction: ltr;
 }
 
-/* ─── Custom Utilities ─── */
-.glass-header {
-  background: rgba(248, 249, 250, 0.8);
-  backdrop-filter: blur(20px);
-}
-
-.primary-gradient-btn {
-  background: linear-gradient(135deg, #00478d 0%, #005eb8 100%);
-}
-
 /* ─── Selection ─── */
 ::selection {
-  background-color: #d6e3ff;
+  background-color: rgba(185, 87, 62, 0.2);
 }
 
 /* ─── Smooth Scrolling ─── */
 html {
   scroll-behavior: smooth;
+}
+
+/* ─── Glass Effects ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-nav {
+  background: rgba(252, 249, 247, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ─── Custom Scrollbar ─── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #dcc0ba;
+  border-radius: 10px;
+}
+
+/* ─── Leaflet Overrides ─── */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
 }
