@@ -1,5 +1,17 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type {
+  TriageSession,
+  SavedHospital,
+  SessionSummaryResponse,
+} from '../services/profileService';
+import {
+  loadSessions,
+  saveSessions,
+  loadSavedHospitals,
+  saveSavedHospitals,
+} from '../services/profileService';
+import type { HospitalResult } from '../services/insuranceService';
 
 // Simple UUID v4 generator
 function generateId(): string {
@@ -40,6 +52,8 @@ export interface AppState {
   userLocation: { lat: number; lng: number } | null;
   suggestClinics: boolean;
   insuranceInfo: InsuranceInfo | null;
+  sessions: TriageSession[];
+  savedHospitals: SavedHospital[];
 }
 
 interface AppContextType extends AppState {
@@ -50,6 +64,10 @@ interface AppContextType extends AppState {
   setUserLocation: (coords: { lat: number; lng: number }) => void;
   setSuggestClinics: (v: boolean) => void;
   setInsuranceInfo: (info: InsuranceInfo | null) => void;
+  saveSession: (session: TriageSession) => void;
+  completeSession: (sessionId: string, summary: SessionSummaryResponse) => void;
+  toggleSaveHospital: (hospital: HospitalResult) => void;
+  isHospitalSaved: (hospitalId: string) => boolean;
 }
 
 const SITUATION_FILTER_MAP: Record<Situation, Filters> = {
@@ -79,6 +97,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
+  const [sessions, _setSessions] = useState<TriageSession[]>(loadSessions);
+  const [savedHospitals, _setSavedHospitals] = useState<SavedHospital[]>(loadSavedHospitals);
 
   const setLanguage = useCallback((lang: 'en' | 'es') => {
     _setLanguage(lang);
@@ -115,6 +135,59 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const saveSession = useCallback((session: TriageSession) => {
+    _setSessions(prev => {
+      const idx = prev.findIndex(s => s.sessionId === session.sessionId);
+      const newSessions = [...prev];
+      if (idx >= 0) {
+        newSessions[idx] = session;
+      } else {
+        newSessions.push(session);
+      }
+      saveSessions(newSessions);
+      return newSessions;
+    });
+  }, []);
+
+  const completeSession = useCallback((sessionId: string, summary: SessionSummaryResponse) => {
+    _setSessions(prev => {
+      const newSessions = prev.map(s => {
+        if (s.sessionId === sessionId) {
+          return {
+            ...s,
+            status: 'completed' as const,
+            title: summary.title,
+            summary: summary.summary,
+            severity: summary.severity,
+            tags: summary.tags,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return s;
+      });
+      saveSessions(newSessions);
+      return newSessions;
+    });
+  }, []);
+
+  const toggleSaveHospital = useCallback((hospital: HospitalResult) => {
+    _setSavedHospitals(prev => {
+      const exists = prev.some(h => h.hospital.id === hospital.id);
+      let newSaved;
+      if (exists) {
+        newSaved = prev.filter(h => h.hospital.id !== hospital.id);
+      } else {
+        newSaved = [...prev, { hospital, savedAt: new Date().toISOString() }];
+      }
+      saveSavedHospitals(newSaved);
+      return newSaved;
+    });
+  }, []);
+
+  const isHospitalSaved = useCallback((hospitalId: string) => {
+    return savedHospitals.some(h => h.hospital.id === hospitalId);
+  }, [savedHospitals]);
+
   return (
     <AppContext.Provider
       value={{
@@ -126,6 +199,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         userLocation,
         suggestClinics,
         insuranceInfo,
+        sessions,
+        savedHospitals,
         setLanguage,
         setSituation,
         addMessage,
@@ -133,6 +208,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setUserLocation,
         setSuggestClinics,
         setInsuranceInfo,
+        saveSession,
+        completeSession,
+        toggleSaveHospital,
+        isHospitalSaved,
       }}
     >
       {children}

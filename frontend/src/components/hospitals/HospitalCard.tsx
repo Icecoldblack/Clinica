@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useAppContext } from '../../context/AppContext';
 import type { HospitalResult } from '../../services/insuranceService';
 
 interface HospitalCardProps {
@@ -9,6 +10,8 @@ interface HospitalCardProps {
 
 export default function HospitalCard({ hospital, isActive, onClick }: HospitalCardProps) {
   const { t } = useTranslation();
+  const { toggleSaveHospital, isHospitalSaved } = useAppContext();
+  const isSaved = isHospitalSaved(hospital.id);
 
   let insuranceBadgeClass = 'bg-surface-container-high text-on-surface-variant';
   let insuranceBadgeLabel = t('hospitals.coverage_unknown');
@@ -54,6 +57,20 @@ export default function HospitalCard({ hospital, isActive, onClick }: HospitalCa
               {hospital.rating.toFixed(1)} <span className="text-on-surface-variant text-xs font-medium">({hospital.userRatingsTotal})</span>
             </div>
           )}
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleSaveHospital(hospital); }}
+            className={`p-2 rounded-full flex items-center justify-center transition-colors ${
+              isSaved ? 'text-primary bg-primary/10' : 'text-on-surface-variant hover:bg-surface-container-high'
+            }`}
+            title={isSaved ? t('hospitals.unsave', 'Remove saved hospital') : t('hospitals.save', 'Save hospital')}
+          >
+            <span
+              className="material-symbols-outlined text-[18px]"
+              style={isSaved ? { fontVariationSettings: "'FILL' 1" } : undefined}
+            >
+              bookmark
+            </span>
+          </button>
         </div>
       </div>
 

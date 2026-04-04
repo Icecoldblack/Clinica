@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { sendMessage } from '../services/chatService';
 
 export function useChat() {
-  const { sessionId, language, situation, chatHistory, addMessage, setSuggestClinics } = useAppContext();
+  const { sessionId, language, situation, chatHistory, addMessage, setSuggestClinics, saveSession, sessions } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,13 +38,30 @@ export function useChat() {
         if (res.suggestClinics) {
           setSuggestClinics(true);
         }
+
+        const existingSession = sessions.find(s => s.sessionId === sessionId);
+        const createdAt = existingSession?.createdAt || new Date().toISOString();
+
+        saveSession({
+          sessionId,
+          situation: situation!,
+          language,
+          status: 'active',
+          createdAt,
+          updatedAt: new Date().toISOString(),
+          messages: [...chatHistory, userMsg, modelMsg],
+          title: existingSession?.title || null,
+          summary: existingSession?.summary || null,
+          severity: existingSession?.severity || null,
+          tags: existingSession?.tags || [],
+        });
       } catch {
         setError('Failed to send message. Please try again.');
       } finally {
         setIsLoading(false);
       }
     },
-    [sessionId, language, situation, chatHistory, addMessage, setSuggestClinics]
+    [sessionId, language, situation, chatHistory, addMessage, setSuggestClinics, saveSession, sessions]
   );
 
   return { isLoading, error, sendMessage: send };

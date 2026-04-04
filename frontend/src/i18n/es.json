@@ -118,7 +118,17 @@
     "explore_more": "Explorar Instalaciones",
     "need_help": "¿Necesitas ayuda hoy?",
     "need_help_desc": "Inicia un nuevo triaje y obtén recomendaciones de clínicas en minutos.",
-    "new_triage": "Nueva Evaluación"
+    "new_triage": "Nueva Evaluación",
+    "finish_session": "Finalizar Sesión",
+    "insurance_provider": "Proveedor de Seguro",
+    "insurance_plan": "Plan",
+    "messages_count": "mensajes",
+    "no_sessions": "Aún no hay sesiones de triaje",
+    "no_sessions_desc": "Inicia una conversación de salud para recibir orientación.",
+    "start_first_session": "Iniciar Tu Primera Sesión",
+    "no_saved_hospitals": "Aún no hay hospitales guardados",
+    "no_saved_hospitals_desc": "Busca y guarda hospitales para acceso rápido.",
+    "find_hospitals_cta": "Buscar Hospitales"
   },
   "resources": {
     "badge": "CENTRO DE CONOCIMIENTO",
@@ -184,6 +194,8 @@
     "home_card_title": "Encontrar Hospitales Cerca",
     "home_card_body": "Busca hospitales que acepten tu seguro. Impulsado por Google Maps + verificación con IA.",
     "home_card_placeholder": "Ingresa código postal",
-    "home_card_cta": "Buscar →"
+    "home_card_cta": "Buscar →",
+    "save": "Guardar hospital",
+    "unsave": "Eliminar hospital guardado"
   }
 }
