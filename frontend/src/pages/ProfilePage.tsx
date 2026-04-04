@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import SidebarLayout from '../components/layout/SidebarLayout';
@@ -18,11 +17,7 @@ export default function ProfilePage() {
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
-  useEffect(() => {
-    if (!situation) navigate('/', { replace: true });
-  }, [situation, navigate]);
-
-  if (!situation) return null;
+  if (!situation) return <Navigate to="/" replace />;
 
   const situationLabel: Record<string, string> = {
     no_insurance: Object.keys(t('home', { returnObjects: true }) as object).includes('sit_no_insurance') ? t('home.sit_no_insurance') : 'No Insurance',

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import { useHospitalSearch } from '../hooks/useHospitalSearch';
@@ -9,7 +9,6 @@ import HospitalCard from '../components/hospitals/HospitalCard';
 import InsuranceModal from '../components/hospitals/InsuranceModal';
 
 export default function HospitalsPage() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { situation, insuranceInfo, userLocation, setUserLocation } = useAppContext();
@@ -20,11 +19,6 @@ export default function HospitalsPage() {
   const [radius, setRadius] = useState<number>(10);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-
-  // Route guard
-  useEffect(() => {
-    if (!situation) navigate('/', { replace: true });
-  }, [situation, navigate]);
 
   // Initial search if zip is provided in URL and we have insurance config
   useEffect(() => {
@@ -105,7 +99,7 @@ export default function HospitalsPage() {
     }
   };
 
-  if (!situation) return null;
+  if (!situation) return <Navigate to="/" replace />;
 
   const mapCenter = results && results.hospitals.length > 0
     ? { lat: results.hospitals[0].lat, lng: results.hospitals[0].lng }

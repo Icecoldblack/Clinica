@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 import { useChat } from '../hooks/useChat';
@@ -15,13 +15,6 @@ export default function ChatPage() {
   const { isLoading, error, sendMessage } = useChat();
   const [isFinishing, setIsFinishing] = useState(false);
   const seededRef = useRef(false);
-
-  // Route guard
-  useEffect(() => {
-    if (!situation) {
-      navigate('/', { replace: true });
-    }
-  }, [situation, navigate]);
 
   // Seed opening message (ref prevents StrictMode double-fire)
   useEffect(() => {
@@ -51,7 +44,7 @@ export default function ChatPage() {
     }
   };
 
-  if (!situation) return null;
+  if (!situation) return <Navigate to="/" replace />;
 
   return (
     <SidebarLayout activeNav="chat">
