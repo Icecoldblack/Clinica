@@ -94,10 +94,15 @@ export default function ResourcesPage() {
                   </li>
                 ))}
               </ul>
-              <button className="text-primary font-bold flex items-center gap-2 hover:underline">
+              <a 
+                href="https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/understanding/consumers/consumer_rights.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary font-bold flex items-center gap-2 hover:underline w-fit"
+              >
                 {t('resources.download_guide')}
                 <span className="material-symbols-outlined text-sm">download</span>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -146,6 +151,7 @@ export default function ResourcesPage() {
                 gradient: 'from-primary to-primary-container',
                 action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
+                href: 'https://bphc.hrsa.gov/sites/default/files/bphc/about/healthcenterfactsheet.pdf',
               },
               {
                 title: t('resources.lib_2_title'),
@@ -155,6 +161,7 @@ export default function ResourcesPage() {
                 gradient: 'from-secondary to-on-secondary-container',
                 action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
+                href: 'https://www.hhs.gov/sites/default/files/language-access-plan-2023.pdf',
               },
               {
                 title: t('resources.lib_3_title'),
@@ -164,6 +171,7 @@ export default function ResourcesPage() {
                 gradient: 'from-tertiary to-tertiary-container',
                 action: t('resources.btn_download'),
                 actionIcon: 'arrow_forward',
+                href: 'https://www.medicare.gov/Pubs/pdf/10050-Medicare-and-You.pdf',
               },
               {
                 title: t('resources.lib_4_title'),
@@ -173,11 +181,15 @@ export default function ResourcesPage() {
                 gradient: 'from-inverse-surface to-on-surface',
                 action: t('resources.btn_watch'),
                 actionIcon: 'play_circle',
+                href: 'https://www.youtube.com/results?search_query=how+to+advocate+for+a+family+member+in+the+hospital',
               },
             ].map((card) => (
-              <div
+              <a
                 key={card.title}
-                className="bg-surface-container-low p-6 rounded-xl group cursor-pointer hover:shadow-2xl hover:shadow-primary/5 transition-all"
+                href={card.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-surface-container-low p-6 rounded-xl group cursor-pointer hover:shadow-2xl hover:shadow-primary/5 transition-all block"
               >
                 <div className="aspect-[3/4] rounded-lg overflow-hidden mb-6 border border-outline-variant/10">
                   <div className={`w-full h-full bg-gradient-to-br ${card.gradient} p-6 flex flex-col justify-between`}>
@@ -193,7 +205,7 @@ export default function ResourcesPage() {
                   <span>{card.action}</span>
                   <span className="material-symbols-outlined">{card.actionIcon}</span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </section>
