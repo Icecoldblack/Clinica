@@ -11,7 +11,7 @@ import ChatInput from '../components/chat/ChatInput';
 export default function ChatPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { situation, chatHistory, addMessage, suggestClinics, sessionId, language, resetChat, userLocation, setUserLocation } = useAppContext();
+  const { situation, chatHistory, addMessage, sessionId, language, resetChat, userLocation, setUserLocation } = useAppContext();
   const { isLoading, error, sendMessage } = useChat();
   const seededRef = useRef(false);
 
@@ -78,18 +78,6 @@ export default function ChatPage() {
         {error && (
           <div className="text-center mb-3">
             <p className="text-sm text-error bg-error/10 inline-block px-4 py-2 rounded-xl">{error}</p>
-          </div>
-        )}
-
-        {suggestClinics && (
-          <div className="text-center mb-3">
-            <button
-              onClick={() => navigate('/hospitals')}
-              className="bg-secondary text-white px-6 py-2 rounded-lg font-bold hover:bg-on-secondary-container transition-all active:scale-95 inline-flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-sm">local_hospital</span>
-              {t('nav.hospitals')}
-            </button>
           </div>
         )}
 
