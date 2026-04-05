@@ -221,10 +221,13 @@ export default function ResourcesPage() {
                 <span className="material-symbols-outlined">chat</span>
                 {t('resources.chat_navigator')}
               </button>
-              <button className="bg-white text-primary px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-surface-container transition-all">
+                <a
+                href="tel:911"
+                className="bg-white text-primary px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-surface-container transition-all"
+                >
                 <span className="material-symbols-outlined">call</span>
-                1-800-CLINICA
-              </button>
+                911
+                </a>
             </div>
           </div>
         </section>
