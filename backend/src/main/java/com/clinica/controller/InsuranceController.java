@@ -48,8 +48,7 @@ public class InsuranceController {
                     "Medicare Part A (Hospital)", "Medicare Part B (Medical)",
                     "Medicare Part C (Advantage)", "Medicare Part D (Prescription)")),
             new InsuranceProvider("TRICARE", List.of(
-                    "TRICARE Prime", "TRICARE Select", "TRICARE For Life", "TRICARE Young Adult")),
-            new InsuranceProvider("Other / Not Listed", List.of())
+                    "TRICARE Prime", "TRICARE Select", "TRICARE For Life", "TRICARE Young Adult"))
     );
 
     @GetMapping("/insurance/providers")

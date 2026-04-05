@@ -35,6 +35,11 @@ export default function InsuranceModal({ onClose, onSave }: InsuranceModalProps)
   }, []);
 
   const handleSave = () => {
+    if (selectedProvider === 'none') {
+      setInsuranceInfo(null);
+      onSave();
+      return;
+    }
     const isCustom = selectedProvider === 'other' || selectedPlan === 'other';
     const finalProvider = selectedProvider === 'other' ? customProvider : selectedProvider;
     const finalPlan = selectedPlan === 'other' ? customPlan : selectedPlan;
@@ -80,10 +85,11 @@ export default function InsuranceModal({ onClose, onSave }: InsuranceModalProps)
                 className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none text-on-surface"
               >
                 <option value="" disabled>{t('onboarding.insurance_provider_placeholder')}</option>
+                <option value="none">{t('onboarding.insurance_none') || 'None'}</option>
                 {providers.map((p) => (
                   <option key={p.name} value={p.name}>{p.name}</option>
                 ))}
-                <option value="other">{t('onboarding.insurance_custom_provider') || 'Other / Not listed'}</option>
+                <option value="other">{t('onboarding.insurance_other_provider') || 'Enter your provider'}</option>
               </select>
               <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
             </div>
@@ -116,7 +122,7 @@ export default function InsuranceModal({ onClose, onSave }: InsuranceModalProps)
                   {availablePlans.map((plan) => (
                     <option key={plan} value={plan}>{plan}</option>
                   ))}
-                  <option value="other">{t('onboarding.insurance_custom_plan') || 'Other / Not listed'}</option>
+                  <option value="other">{t('onboarding.insurance_other_plan') || 'Enter your plan'}</option>
                 </select>
                 <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
               </div>
