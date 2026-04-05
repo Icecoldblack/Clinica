@@ -85,6 +85,7 @@ public class GeminiService {
                 }
                 searchRequest.setInsuranceProvider(searchInsurance);
                 searchRequest.setPlanName(searchPlan);
+                searchRequest.setAge(request.getAge());
 
                 HospitalListResponse result = hospitalService.searchHospitals(searchRequest);
                 hospitals = result.getHospitals().stream().limit(5).toList();
@@ -434,7 +435,16 @@ public class GeminiService {
         StringBuilder ctx = new StringBuilder("PATIENT PROFILE (from onboarding — do not ask for this again):\n");
 
         if (request.getAge() != null) {
-            ctx.append("- Age: ").append(request.getAge()).append("\n");
+            int age = request.getAge();
+            String ageGroup = age < 18 ? "pediatric (child/adolescent)" : age >= 65 ? "senior (65+)" : "adult";
+            ctx.append("- Age: ").append(age).append(" (").append(ageGroup).append(")\n");
+            ctx.append("  ↳ When recommending hospitals, consider age suitability: "
+                    + (age < 18
+                        ? "prefer pediatric hospitals or hospitals with dedicated children's services. Avoid recommending adult-only or geriatric facilities."
+                        : age >= 65
+                        ? "prefer hospitals experienced with senior care, consider Medicare acceptance."
+                        : "general adult hospitals are appropriate.")
+                    + "\n");
         }
 
         if (request.getInsuranceProvider() != null && !request.getInsuranceProvider().isBlank()) {

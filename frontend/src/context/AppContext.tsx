@@ -88,6 +88,10 @@ interface AppContextType extends AppState {
   isHospitalSaved: (hospitalId: string) => boolean;
   setChatHospitalResults: (hospitals: HospitalResult[] | null, context: string | null, insurance?: string | null, plan?: string | null) => void;
   resetChat: () => void;
+  // Route transition overlay
+  showRouteTransition: boolean;
+  triggerRouteTransition: (onNavigate: () => void) => void;
+  dismissRouteTransition: () => void;
 }
 
 const SITUATION_FILTER_MAP: Record<Situation, Filters> = {
@@ -138,6 +142,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [chatHospitalContext, _setChatHospitalContext] = useState<string | null>(null);
   const [chatSearchInsurance, _setChatSearchInsurance] = useState<string | null>(null);
   const [chatSearchPlan, _setChatSearchPlan] = useState<string | null>(null);
+  const [showRouteTransition, _setShowRouteTransition] = useState(false);
 
   const setLanguage = useCallback((lang: 'en' | 'es') => {
     _setLanguage(lang);
@@ -199,6 +204,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     _setChatHospitalContext(null);
     _setChatSearchInsurance(null);
     _setChatSearchPlan(null);
+  }, []);
+
+  // ── Route Transition ──
+  // Phase 1 (0–800ms): Show overlay, animate logo in.
+  // Phase 2 (800ms): Call the navigate callback — route changes, new page renders under the overlay.
+  // Phase 3 (800–1400ms): Overlay fades out, revealing the new page.
+  // Phase 4 (1400ms): Hide overlay entirely.
+  const triggerRouteTransition = useCallback((onNavigate: () => void) => {
+    _setShowRouteTransition(true);
+    setTimeout(() => {
+      onNavigate();
+    }, 900);
+  }, []);
+
+  const dismissRouteTransition = useCallback(() => {
+    _setShowRouteTransition(false);
   }, []);
 
   const saveSession = useCallback((session: TriageSession) => {
@@ -286,6 +307,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         isHospitalSaved,
         setChatHospitalResults,
         resetChat,
+        showRouteTransition,
+        triggerRouteTransition,
+        dismissRouteTransition,
       }}
     >
       {children}

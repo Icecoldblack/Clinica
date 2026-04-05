@@ -22,7 +22,13 @@
     "insurance_custom_plan": "Enter your plan name",
     "insurance_skip": "Skip for now",
     "insurance_continue": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "age_label": "Your Age",
+    "age_placeholder": "e.g. 34",
+    "age_hint": "Helps us find age-appropriate clinics and hospitals for you."
+  },
+  "common": {
+    "optional": "optional"
   },
   "chat": {
     "placeholder": "Describe your symptoms or ask a question...",

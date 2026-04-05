@@ -17,4 +17,6 @@ public class HospitalSearchRequest {
     private String planName;            // Optional — specific plan within the provider
 
     private int radiusMiles = 10;       // Default search radius
+
+    private Integer age;                // Patient age — used to filter age-inappropriate hospitals (e.g. children's-only)
 }

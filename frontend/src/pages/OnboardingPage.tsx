@@ -14,7 +14,7 @@ const SITUATIONS: { key: Situation; icon: string; labelKey: string; descKey: str
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { setSituation, setInsuranceInfo, language, setLanguage } = useAppContext();
+  const { setSituation, setInsuranceInfo, setAge, language, setLanguage, triggerRouteTransition } = useAppContext();
   
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedSituation, setSelectedSituation] = useState<Situation | null>(null);
@@ -25,6 +25,7 @@ export default function OnboardingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [customProvider, setCustomProvider] = useState<string>('');
   const [customPlan, setCustomPlan] = useState<string>('');
+  const [ageInput, setAgeInput] = useState<string>('');
 
   useEffect(() => {
     let mounted = true;
@@ -52,7 +53,9 @@ export default function OnboardingPage() {
       setSituation(selectedSituation);
     }
     setInsuranceInfo(insurance);
-    navigate('/home');
+    const parsedAge = ageInput.trim() !== '' ? parseInt(ageInput, 10) : null;
+    setAge(!isNaN(parsedAge as number) && parsedAge !== null ? parsedAge : null);
+    triggerRouteTransition(() => navigate('/home'));
   };
 
   const handleSkipInsurance = () => {
@@ -193,6 +196,35 @@ export default function OnboardingPage() {
               </div>
 
               <div className="space-y-6">
+                {/* Age field */}
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-2">
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base">cake</span>
+                      {t('onboarding.age_label') || 'Your Age'}
+                      <span className="text-on-surface-variant/50 font-normal">({t('common.optional') || 'optional'})</span>
+                    </span>
+                  </label>
+                  <input
+                    id="onboarding-age"
+                    type="number"
+                    min="1"
+                    max="120"
+                    placeholder={t('onboarding.age_placeholder') || 'e.g. 34'}
+                    value={ageInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= 120)) {
+                        setAgeInput(val);
+                      }
+                    }}
+                    className="w-full p-4 rounded-xl border border-outline-variant/30 bg-surface focus:border-primary focus:ring-2 focus:ring-primary/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <p className="text-xs text-on-surface-variant/60 mt-1.5">
+                    {t('onboarding.age_hint') || 'Helps us find age-appropriate clinics and hospitals for you.'}
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-bold text-on-surface-variant mb-2">
                     {t('onboarding.insurance_provider_label')}

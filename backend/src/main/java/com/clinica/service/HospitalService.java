@@ -124,20 +124,27 @@ public class HospitalService {
                     List.of(), searchLocation, provider, plan, 0, 0);
         }
 
-        // 4. Sort by matchScore descending, then distance as tiebreaker
+        // 4. Age-based suitability filter for seed hospitals
+        if (request.getAge() != null) {
+            int age = request.getAge();
+            scored = scored.stream().filter(h -> isAgeAppropriate(h, age)).collect(
+                    java.util.stream.Collectors.toList());
+        }
+
+        // 5. Sort by matchScore descending, then distance as tiebreaker
         scored.sort(Comparator
                 .comparingInt(Hospital::getMatchScore).reversed()
                 .thenComparingDouble(Hospital::getDistanceMiles));
 
-        // 5. Take top 10
+        // 6. Take top 10
         List<Hospital> top = new ArrayList<>(scored.stream().limit(10).toList());
 
-        // 5b. Enrich Places hospitals with phone/website/address from Details API
+        // 6b. Enrich Places hospitals with phone/website/address from Details API
         placesService.enrichWithDetails(top);
 
-        // 6. Gemini enrichment — write a coverage note for each hospital
+        // 7. Gemini enrichment — write a coverage note for each hospital
         if (apiKey != null && !apiKey.isBlank()) {
-            enrichWithCoverageNotes(top, provider, plan);
+            enrichWithCoverageNotes(top, provider, plan, request.getAge());
         }
 
         long inNetworkCount = top.stream().filter(h -> Boolean.TRUE.equals(h.getInNetwork())).count();
@@ -240,6 +247,19 @@ public class HospitalService {
         return 0;
     }
 
+    private boolean isAgeAppropriate(Hospital hospital, int age) {
+        String nameLower = hospital.getName().toLowerCase();
+        String typeLower = hospital.getType() != null ? hospital.getType().toLowerCase() : "";
+        boolean isChildrensFacility = nameLower.contains("children") || nameLower.contains("pediatric")
+                || nameLower.contains("kids") || typeLower.contains("pediatric");
+        boolean isGeriatricFacility = nameLower.contains("geriatric") || nameLower.contains("senior");
+        // Children's-only facilities: only appropriate for ages < 18 (some take up to 21)
+        if (isChildrensFacility && age > 21) return false;
+        // Pure geriatric facilities: generally for 65+
+        if (isGeriatricFacility && age < 55) return false;
+        return true;
+    }
+
     // ─── Gemini enrichment ──────────────────────────────────────────────────
 
     /**
@@ -248,7 +268,7 @@ public class HospitalService {
      * Places hospitals are marked as unknown so Gemini makes an educated estimate.
      * No Google Search grounding — uses Gemini's training knowledge (much faster).
      */
-    private void enrichWithCoverageNotes(List<Hospital> hospitals, String provider, String plan) {
+    private void enrichWithCoverageNotes(List<Hospital> hospitals, String provider, String plan, Integer patientAge) {
         try {
             String planDesc = (plan != null && !plan.isBlank())
                     ? provider + " (" + plan + ")"
@@ -264,11 +284,16 @@ public class HospitalService {
                         i + 1, h.getName(), h.getType(), h.getAddress(), networkStatus));
             }
 
+            String patientContext = patientAge != null
+                    ? "The patient is " + patientAge + " years old ("
+                      + (patientAge < 18 ? "pediatric" : patientAge >= 65 ? "senior" : "adult") + ")."
+                    : "Patient age unknown.";
+
             String prompt = """
                     You are an expert US healthcare insurance advisor with deep knowledge of \
                     hospital networks, insurance contracts, and provider directories.
 
-                    A patient has **%s** health insurance.
+                    A patient has **%s** health insurance. %s
 
                     For each hospital below:
                     1. Determine if the hospital likely accepts this insurance plan.
@@ -279,7 +304,9 @@ public class HospitalService {
                          (Emory, Piedmont, Northside, WellStar, Grady, CHOA, HCA, etc.) accept \
                          Medicare, Medicaid, and most major commercial plans. Smaller independent \
                          practices vary more.
-                    2. Write ONE concise sentence (max 25 words) about their coverage situation.
+                    2. Write ONE concise sentence (max 30 words) about their coverage situation.
+                       - If the hospital has age restrictions (e.g., children's-only, adult-only), \
+                         note whether the patient is eligible in the sentence.
 
                     Hospitals:
                     %s
@@ -298,7 +325,8 @@ public class HospitalService {
                     - For Medicare/Medicaid: most hospitals accept these by law; set true unless it's a very specialized/boutique facility
                     - For commercial plans (BCBS, Aetna, Cigna, UHC, etc.): major hospital systems usually accept them
                     - Be helpful — an educated estimate is better than "unknown"
-                    """.formatted(planDesc, hospitalList);
+                    - Age suitability: if hospital type conflicts with patient age (e.g., children's hospital for an adult), mention eligibility in the note
+                    """.formatted(planDesc, patientContext, hospitalList);
 
             // Build generation config with minimal thinking to maximize output tokens
             Map<String, Object> genConfig = new java.util.HashMap<>();
