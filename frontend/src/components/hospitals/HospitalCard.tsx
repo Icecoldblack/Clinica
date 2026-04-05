@@ -6,9 +6,10 @@ interface HospitalCardProps {
   hospital: HospitalResult;
   isActive?: boolean;
   onClick?: () => void;
+  activeInsurance?: string;
 }
 
-export default function HospitalCard({ hospital, isActive, onClick }: HospitalCardProps) {
+export default function HospitalCard({ hospital, isActive, onClick, activeInsurance }: HospitalCardProps) {
   const { t } = useTranslation();
   const { toggleSaveHospital, isHospitalSaved } = useAppContext();
   const isSaved = isHospitalSaved(hospital.id);
@@ -19,7 +20,9 @@ export default function HospitalCard({ hospital, isActive, onClick }: HospitalCa
 
   if (hospital.acceptsInsurance === true) {
     insuranceBadgeClass = 'bg-primary/20 text-primary border border-primary/30';
-    insuranceBadgeLabel = t('hospitals.in_network');
+    insuranceBadgeLabel = activeInsurance === 'Self-pay' 
+      ? t('hospitals.self_pay_accepted', 'Self-Pay Accepted') 
+      : t('hospitals.in_network');
     insuranceIcon = 'check_circle';
   } else if (hospital.acceptsInsurance === false) {
     insuranceBadgeClass = 'bg-error/20 text-error border border-error/30';

@@ -50,7 +50,10 @@ export default function EmbeddedHospitalCards({ hospitals, hospitalSearchContext
             <div className="mb-2">
               {h.acceptsInsurance === true && (
                 <span className="text-[10px] font-bold bg-primary/15 text-primary px-2 py-0.5 rounded-full">
-                  {t('hospitals.in_network', 'In-Network')} ✓
+                  {searchInsurance === 'Self-pay'
+                    ? t('hospitals.self_pay_accepted', 'Self-Pay Accepted')
+                    : `${t('hospitals.in_network', 'In-Network')} ✓`
+                  }
                 </span>
               )}
               {h.acceptsInsurance === false && (

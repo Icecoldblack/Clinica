@@ -35,6 +35,32 @@ export default function HospitalsPage() {
     }
   }, []);
 
+  // Autofill zip code via reverse geocoding if we have location but no zip
+  useEffect(() => {
+    if (!zipCode && userLocation?.lat && userLocation?.lng) {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      if (!apiKey) return;
+      
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation.lat},${userLocation.lng}&key=${apiKey}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.results && data.results.length > 0) {
+            const fetchedZip = data.results[0].address_components.find(
+              (c: any) => c.types.includes('postal_code')
+            )?.long_name;
+            if (fetchedZip) {
+              setZipCode(fetchedZip);
+              // Also update url with zip code so it matches
+              const newParams = new URLSearchParams(searchParams);
+              newParams.set('zip', fetchedZip);
+              setSearchParams(newParams);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [userLocation?.lat, userLocation?.lng]);
+
   // Sync user location for hospitals when a zip code search returns hospitals
   useEffect(() => {
     if (results?.hospitals && results.hospitals.length > 0 && zipCode) {
@@ -265,6 +291,7 @@ export default function HospitalsPage() {
                     hospital={h} 
                     isActive={activeItemId === h.id}
                     onClick={() => setActiveItemId(h.id)}
+                    activeInsurance={urlInsurance || insuranceInfo?.provider || 'none'}
                   />
                 ))}
               </div>

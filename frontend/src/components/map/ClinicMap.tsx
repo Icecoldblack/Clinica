@@ -82,8 +82,12 @@ function MapController({
     if (activeHospitalId) {
       const h = hospitals.find((h) => h.id === activeHospitalId);
       if (h) animateCamera(h.lat, h.lng, 15, 900);
+    } else if (hospitals.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      hospitals.forEach((h) => bounds.extend({ lat: h.lat, lng: h.lng }));
+      map.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
     } else {
-      animateCamera(center.lat, center.lng, 11, 700);
+      animateCamera(center.lat, center.lng, 12, 700);
     }
   }, [map, activeHospitalId, hospitals, center, animateCamera]);
 
